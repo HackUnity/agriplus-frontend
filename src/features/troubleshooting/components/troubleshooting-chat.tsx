@@ -1,14 +1,12 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { Bot, Send, User } from "lucide-react";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { Bot, User } from "lucide-react";
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { DiagnosisImageUpload } from "@/features/troubleshooting/components/diagnosis-image-upload";
-import { ProjectContextPanel } from "@/features/troubleshooting/components/project-context-panel";
+import { ChatPromptComposer } from "@/features/troubleshooting/components/chat-prompt-composer";
 import {
   DIAGNOSIS_CATEGORIES,
   type DiagnosisCategory,
@@ -19,6 +17,7 @@ type Message = {
   id: string;
   role: "user" | "assistant";
   content: string;
+  image?: string;
 };
 
 const suggestions = [
@@ -62,10 +61,15 @@ export function TroubleshootingChat({
     },
   ]);
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   function selectCategory(next: DiagnosisCategory) {
     setCategory((current) => (current === next ? null : next));
   }
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
 
   async function sendMessage(event?: FormEvent) {
     event?.preventDefault();
@@ -75,14 +79,17 @@ export function TroubleshootingChat({
     }
 
     const payload = buildQuestionPayload(trimmed, category);
+    const sentImage = image;
 
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: "user",
       content: payload,
+      image: sentImage,
     };
     setMessages((current) => [...current, userMessage]);
     setQuestion("");
+    setImage(undefined);
     setLoading(true);
 
     const response = await fetch("/api/ai/troubleshoot", {
@@ -112,52 +119,68 @@ export function TroubleshootingChat({
         description="Ask project-aware questions. For serious crop disease, chemical use, or food safety decisions, confirm with a local expert."
       />
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        <Card>
-          <CardContent className="space-y-5 p-5">
-            <div className="max-h-[55vh] space-y-4 overflow-y-auto pr-1">
-              {messages.map((message) => {
-                const assistant = message.role === "assistant";
+      <div className="grid gap-4 lg:grid-cols-[1fr_320px] lg:items-start">
+        <Card className="flex flex-col overflow-hidden">
+          <CardContent className="flex h-[min(720px,calc(100dvh-13rem))] flex-col p-0">
+            <div className="min-h-0 flex-1 overflow-y-auto p-5">
+              <div className="space-y-4">
+                {messages.map((message) => {
+                  const assistant = message.role === "assistant";
 
-                return (
-                  <div
-                    key={message.id}
-                    className={cn(
-                      "flex gap-3",
-                      !assistant && "justify-end",
-                    )}
-                  >
-                    {assistant ? (
-                      <Bot className="mt-2 h-5 w-5 shrink-0 text-primary" />
-                    ) : null}
+                  return (
                     <div
+                      key={message.id}
                       className={cn(
-                        "max-w-[85%] rounded-xl px-4 py-3 text-sm leading-6 whitespace-pre-wrap",
-                        assistant
-                          ? "bg-muted text-foreground"
-                          : "bg-primary text-primary-foreground",
+                        "flex gap-3",
+                        !assistant && "justify-end",
                       )}
                     >
-                      {message.content}
+                      {assistant ? (
+                        <Bot className="mt-2 h-5 w-5 shrink-0 text-primary" />
+                      ) : null}
+                      <div
+                        className={cn(
+                          "max-w-[85%] space-y-2 rounded-xl px-4 py-3 text-sm leading-6",
+                          assistant
+                            ? "bg-muted text-foreground"
+                            : "bg-primary text-primary-foreground",
+                        )}
+                      >
+                        {message.image ? (
+                          <div className="h-20 w-20 overflow-hidden rounded-lg border border-white/20">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={message.image}
+                              alt="Attached plant photo"
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                        ) : null}
+                        <p className="whitespace-pre-wrap">{message.content}</p>
+                      </div>
+                      {!assistant ? (
+                        <User className="mt-2 h-5 w-5 shrink-0 text-primary" />
+                      ) : null}
                     </div>
-                    {!assistant ? (
-                      <User className="mt-2 h-5 w-5 shrink-0 text-primary" />
-                    ) : null}
-                  </div>
-                );
-              })}
-              {loading ? (
-                <p className="text-sm text-muted-foreground">
-                  AI is checking the plan context...
-                </p>
-              ) : null}
+                  );
+                })}
+                {loading ? (
+                  <p className="text-sm text-muted-foreground">
+                    AI is checking the plan context...
+                  </p>
+                ) : null}
+                <div ref={messagesEndRef} aria-hidden />
+              </div>
             </div>
 
-            <form className="space-y-5 border-t pt-5" onSubmit={sendMessage}>
-              <ProjectContextPanel projectId={projectId} />
-
+            <form
+              className="shrink-0 space-y-4 border-t bg-background p-5"
+              onSubmit={sendMessage}
+            >
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Quick diagnosis category</Label>
+                <Label className="text-sm font-medium">
+                  Quick diagnosis category
+                </Label>
                 <div className="flex flex-wrap gap-2">
                   {DIAGNOSIS_CATEGORIES.map((item) => {
                     const active = category === item;
@@ -169,8 +192,8 @@ export function TroubleshootingChat({
                         className={cn(
                           "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
                           active
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border bg-background text-foreground hover:bg-muted",
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border bg-background text-foreground hover:bg-muted",
                         )}
                       >
                         {item}
@@ -180,31 +203,16 @@ export function TroubleshootingChat({
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <div className="min-w-0 flex-1 space-y-2">
-                  {stepContext ? (
-                    <Label htmlFor="ask-ai-question" className="text-sm font-medium">
-                      {stepContext.title}
-                    </Label>
-                  ) : null}
-                  <Textarea
-                    id="ask-ai-question"
-                    value={question}
-                    onChange={(event) => setQuestion(event.target.value)}
-                    placeholder="Example: Tomato leaves turned yellow after heavy rain and growth became slow."
-                    className="min-h-24"
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="shrink-0 sm:self-end"
-                >
-                  <Send className="h-4 w-4" /> Send
-                </Button>
-              </div>
-
-              <DiagnosisImageUpload value={image} onChange={setImage} />
+              <ChatPromptComposer
+                question={question}
+                onQuestionChange={setQuestion}
+                image={image}
+                onImageChange={setImage}
+                onSubmit={sendMessage}
+                loading={loading}
+                label={stepContext?.title}
+                placeholder="Example: Tomato leaves turned yellow after heavy rain and growth became slow."
+              />
             </form>
           </CardContent>
         </Card>

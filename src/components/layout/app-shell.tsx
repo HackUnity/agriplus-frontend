@@ -56,21 +56,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const navItems = useMemo(
     () => [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      {
-        href: `/projects/${activeProjectId}`,
-        label: "Project",
-        icon: Leaf,
-      },
-      {
-        href: `/projects/${activeProjectId}/progress`,
-        label: "Steps",
-        icon: ListChecks,
-      },
-      {
-        href: `/projects/${activeProjectId}/troubleshooting`,
-        label: "Ask AI",
-        icon: Bot,
-      },
+      // {
+      //   href: `/projects/${activeProjectId}`,
+      //   label: "Project",
+      //   icon: Leaf,
+      // },
+      // {
+      //   href: `/projects/${activeProjectId}/progress`,
+      //   label: "Steps",
+      //   icon: ListChecks,
+      // },
+      // {
+      //   href: `/projects/${activeProjectId}/troubleshooting`,
+      //   label: "Ask AI",
+      //   icon: Bot,
+      // },
       { href: "/settings", label: "Settings", icon: Settings },
     ],
     [activeProjectId],

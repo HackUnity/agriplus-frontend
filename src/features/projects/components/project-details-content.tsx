@@ -106,7 +106,7 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
         })}
       </div>
 
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Project readiness</CardTitle>
         </CardHeader>
@@ -117,7 +117,7 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
             increase readiness ({readiness}%).
           </p>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }

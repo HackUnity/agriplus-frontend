@@ -33,8 +33,8 @@ export function ProjectCard({ project }: { project: Project }) {
             <span className="font-semibold">Area:</span> {project.area}
           </p>
         </div>
-        <div className="rounded-lg bg-muted p-3 text-sm text-muted-foreground">
-          Next: {project.nextAction}
+        <div className="rounded-lg p-3 text-sm text-muted-foreground">
+          {/* Next: {project.nextAction} */}
         </div>
       </CardContent>
       <CardFooter>
