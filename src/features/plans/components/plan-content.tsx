@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
 import { getPlan } from "@/features/plans/services/plans.service";
+import { FarmVisualizer } from "@/features/farm-visualizer/components/farm-visualizer";
 import { PlanPhases } from "@/features/plans/components/plan-phases";
 
 export function PlanContent({ projectId }: { projectId: string }) {
@@ -34,6 +35,8 @@ export function PlanContent({ projectId }: { projectId: string }) {
       ) : (
         <p className="text-muted-foreground">No cultivation phases available yet.</p>
       )}
+
+      <FarmVisualizer projectId={projectId} embedded />
     </div>
   );
 }
