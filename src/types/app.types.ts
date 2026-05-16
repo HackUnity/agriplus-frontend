@@ -45,6 +45,11 @@ export type PlanPhase = {
   substages: PlanSubstage[];
 };
 
+export type PlanFaq = {
+  question: string;
+  answer: string;
+};
+
 export type FarmingPlan = {
   id: string;
   projectId: string;
@@ -55,6 +60,7 @@ export type FarmingPlan = {
   risks: string[];
   goals: FarmingGoal[];
   phases?: PlanPhase[];
+  faqs?: PlanFaq[];
 };
 
 export type Project = {

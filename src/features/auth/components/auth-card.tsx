@@ -16,9 +16,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AuthApiError, login } from "@/lib/api/auth";
+import { AuthApiError, getMe, login } from "@/lib/api/auth";
 import { setToken } from "@/lib/auth/token";
-import { marketplaceApi } from "@/features/marketplace/api";
 import {
   loginSchema,
   type LoginValues,
@@ -43,9 +42,8 @@ export function AuthCard({ mode }: { mode: "login" | "signup" | "forgot" }) {
     try {
       const token = await login(values);
       setToken(token.access_token);
-      const { user } = await marketplaceApi.me();
-      const role = user?.role?.toLowerCase() ?? "";
-      if (role === "buyer") {
+      const user = await getMe(token.access_token);
+      if (user.role.toLowerCase() === "buyer") {
         router.push("/marketplace-orders");
       } else {
         router.push("/dashboard");
@@ -108,11 +106,6 @@ export function AuthCard({ mode }: { mode: "login" | "signup" | "forgot" }) {
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
-          {/* TESTING: login form disabled — restore before shipping */}
-          <Button className="w-full" asChild>
-            <Link href="/dashboard">Continue to dashboard (testing)</Link>
-          </Button>
-          {/*
           <form
             noValidate
             className="space-y-4"
@@ -160,7 +153,6 @@ export function AuthCard({ mode }: { mode: "login" | "signup" | "forgot" }) {
               {isSubmitting ? "Signing in…" : "Sign in"}
             </Button>
           </form>
-          */}
 
           <div className="space-y-2 text-center text-sm text-muted-foreground">
             <p>

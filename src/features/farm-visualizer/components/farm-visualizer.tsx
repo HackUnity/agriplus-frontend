@@ -1,9 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useMemo } from "react";
 import { Cuboid } from "lucide-react";
 import { PageHeader } from "@/components/common/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { loadPipelineLayout } from "@/features/plans/services/pipeline-storage.service";
 
 const FarmScene = dynamic(
   () =>
@@ -21,12 +23,15 @@ const FarmScene = dynamic(
 );
 
 function FarmPrototypePanel({ projectId }: { projectId: string }) {
+  const layout = useMemo(() => loadPipelineLayout(projectId), [projectId]);
+  const elementCount = layout?.elements?.length ?? 0;
+
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
       <Card>
         <CardContent className="p-3">
           <div className="h-[460px] overflow-hidden rounded-xl bg-muted">
-            <FarmScene />
+            <FarmScene layout={layout} />
           </div>
         </CardContent>
       </Card>
@@ -36,14 +41,25 @@ function FarmPrototypePanel({ projectId }: { projectId: string }) {
           <CardTitle>Layout legend</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-          <p>Project ID: {projectId}</p>
-          <p>Green zones show starter crop beds.</p>
-          <p>The front strip represents a walking path for access.</p>
-          <p>The blue marker represents a water source or filling point.</p>
-          <p>
-            MVP rule: keep the first version understandable before adding a full
-            editor.
-          </p>
+          {layout ? (
+            <>
+              <p>
+                AI-generated layout from your land photo and plan
+                {elementCount > 0 ? ` (${elementCount} elements).` : "."}
+              </p>
+              <p>Green ground = plot area. Brown boxes = raised beds.</p>
+              <p>Orange spheres / green cones = individual plants.</p>
+              <p>Blue lines = irrigation. Brown lines = paths.</p>
+            </>
+          ) : (
+            <>
+              <p>Project ID: {projectId}</p>
+              <p>Green zones show starter crop beds (demo layout).</p>
+              <p>The front strip represents a walking path for access.</p>
+              <p>The blue marker represents a water source or filling point.</p>
+              <p>Complete onboarding with a land photo to generate a custom 3D layout.</p>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

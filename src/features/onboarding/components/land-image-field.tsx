@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+/** Matches backend ``MAX_IMAGE_SIZE_BYTES`` (15 MB). */
+const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
 
 type LandImageFieldProps = {
   value?: string;
@@ -33,7 +34,7 @@ export function LandImageField({ value, onChange, error }: LandImageFieldProps) 
 
     if (file.size > MAX_IMAGE_BYTES) {
       toast.error("Image is too large", {
-        description: "Please use a photo under 4 MB.",
+        description: "Please use a photo under 15 MB.",
       });
       event.target.value = "";
       return;
@@ -60,10 +61,11 @@ export function LandImageField({ value, onChange, error }: LandImageFieldProps) 
   return (
     <div className="space-y-3">
       <div className="space-y-2">
-        <Label htmlFor={inputId}>Land photo (optional)</Label>
+        <Label htmlFor={inputId}>Land photo (required for plan generation)</Label>
         <p className="text-sm text-muted-foreground">
           The AI reads this photo together with your form answers to judge land
-          condition, layout, and risks. Skip if you do not have a photo yet.
+          condition, layout, and risks. You need a clear plot photo before
+          generating your plan.
         </p>
       </div>
 
@@ -95,7 +97,7 @@ export function LandImageField({ value, onChange, error }: LandImageFieldProps) 
         </ol>
         <p className="mt-3 text-xs">
           A clear photo helps the AI match what it sees with your land size, soil, and
-          water answers—so your plan is more accurate. JPG or PNG, under 4 MB.
+          water answers—so your plan is more accurate. JPG or PNG, under 15 MB.
         </p>
       </div>
 

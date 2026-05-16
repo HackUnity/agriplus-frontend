@@ -92,6 +92,13 @@ export async function register(body: RegisterBody): Promise<UserOut> {
   return handleResponse<UserOut>(response);
 }
 
+export async function getMe(accessToken: string): Promise<UserOut> {
+  const response = await apiFetch(`${apiBaseUrl}/auth/me`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return handleResponse<UserOut>(response);
+}
+
 export async function login(body: LoginBody): Promise<TokenResponse> {
   const form = new URLSearchParams();
   form.set("username", body.email);

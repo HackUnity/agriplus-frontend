@@ -11,6 +11,10 @@ import {
   DIAGNOSIS_CATEGORIES,
   type DiagnosisCategory,
 } from "@/features/troubleshooting/constants";
+import {
+  askTroubleshootingExpert,
+  buildCultivationPlanForExpert,
+} from "@/lib/api/troubleshoot";
 import { cn } from "@/lib/utils";
 
 type Message = {
@@ -92,21 +96,34 @@ export function TroubleshootingChat({
     setImage(undefined);
     setLoading(true);
 
-    const response = await fetch("/api/ai/troubleshoot", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ projectId, question: payload }),
-    });
-    const data = (await response.json()) as { answer?: string };
+    const cultivationPlan = buildCultivationPlanForExpert(projectId);
+    let assistantContent: string;
+
+    if (!cultivationPlan) {
+      assistantContent =
+        "No cultivation plan is available for this project yet. Complete onboarding with a land photo first, then ask again.";
+    } else {
+      try {
+        const { answer } = await askTroubleshootingExpert({
+          cultivation_plan: cultivationPlan,
+          question: payload,
+          targetedStepDescription: stepContext?.description,
+        });
+        assistantContent = answer;
+      } catch (error) {
+        assistantContent =
+          error instanceof Error
+            ? error.message
+            : "I could not answer that right now. Try adding more details about the symptom.";
+      }
+    }
 
     setMessages((current) => [
       ...current,
       {
         id: crypto.randomUUID(),
         role: "assistant",
-        content:
-          data.answer ??
-          "I could not answer that right now. Try adding more details about the symptom.",
+        content: assistantContent,
       },
     ]);
     setLoading(false);
