@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AuthApiError, login, register } from "@/lib/api/auth";
+import { setToken } from "@/lib/auth/token";
 import {
   signupSchema,
   type SignupValues,
@@ -29,7 +31,7 @@ export function SignupForm() {
   const [formError, setFormError] = useState<string | null>(null);
 
   const {
-    register,
+    register: registerField,
     handleSubmit,
     getValues,
     formState: { errors },
@@ -37,22 +39,36 @@ export function SignupForm() {
     resolver: zodResolver(signupSchema),
   });
 
-  async function onSubmit(_values: SignupValues) {
+  async function onSubmit(values: SignupValues) {
     setFormState("submitting");
     setFormError(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    // In demo mode, always succeed and redirect to dashboard.
-    // With Supabase connected, replace this block with:
-    //   const supabase = createClient();
-    //   const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name } } });
-    //   if (error) { setFormError(...); setFormState("error"); return; }
-    setFormState("success");
-    setTimeout(() => router.push("/dashboard"), 1200);
+    try {
+      await register({
+        first_name: values.firstName.trim(),
+        surname: values.surname.trim(),
+        email: values.email,
+        password: values.password,
+      });
+      const token = await login({
+        email: values.email,
+        password: values.password,
+      });
+      setToken(token.access_token);
+      setFormState("success");
+      setTimeout(() => router.push("/dashboard"), 1200);
+    } catch (err) {
+      setFormState("idle");
+      if (err instanceof AuthApiError) {
+        setFormError(err.message);
+      } else {
+        setFormError("Could not create your account. Check your connection and try again.");
+      }
+    }
   }
 
   if (formState === "success") {
+    const { firstName, surname } = getValues();
     return (
       <main className="flex min-h-screen items-center justify-center px-4 py-12">
         <Card className="w-full max-w-md text-center">
@@ -60,7 +76,7 @@ export function SignupForm() {
             <CheckCircle2 className="mx-auto h-12 w-12 text-primary" />
             <h2 className="text-xl font-bold">Account created</h2>
             <p className="text-sm text-muted-foreground">
-              Welcome, {getValues("fullName")}. Taking you to your workspace…
+              Welcome, {firstName} {surname}. Taking you to your workspace…
             </p>
           </CardContent>
         </Card>
@@ -90,21 +106,40 @@ export function SignupForm() {
               </div>
             ) : null}
 
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Full name</Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Your name"
-                autoComplete="name"
-                aria-invalid={!!errors.fullName}
-                {...register("fullName")}
-              />
-              {errors.fullName ? (
-                <p className="text-sm text-destructive">
-                  {errors.fullName.message}
-                </p>
-              ) : null}
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First name</Label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  placeholder="Jane"
+                  autoComplete="given-name"
+                  aria-invalid={!!errors.firstName}
+                  {...registerField("firstName")}
+                />
+                {errors.firstName ? (
+                  <p className="text-sm text-destructive">
+                    {errors.firstName.message}
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="surname">Surname</Label>
+                <Input
+                  id="surname"
+                  type="text"
+                  placeholder="Doe"
+                  autoComplete="family-name"
+                  aria-invalid={!!errors.surname}
+                  {...registerField("surname")}
+                />
+                {errors.surname ? (
+                  <p className="text-sm text-destructive">
+                    {errors.surname.message}
+                  </p>
+                ) : null}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -115,7 +150,7 @@ export function SignupForm() {
                 placeholder="you@example.com"
                 autoComplete="email"
                 aria-invalid={!!errors.email}
-                {...register("email")}
+                {...registerField("email")}
               />
               {errors.email ? (
                 <p className="text-sm text-destructive">
@@ -129,10 +164,10 @@ export function SignupForm() {
               <Input
                 id="password"
                 type="password"
-                placeholder="At least 8 characters"
+                placeholder="8+ chars, upper, lower, number, symbol"
                 autoComplete="new-password"
                 aria-invalid={!!errors.password}
-                {...register("password")}
+                {...registerField("password")}
               />
               {errors.password ? (
                 <p className="text-sm text-destructive">
@@ -149,7 +184,7 @@ export function SignupForm() {
                 placeholder="Repeat your password"
                 autoComplete="new-password"
                 aria-invalid={!!errors.confirmPassword}
-                {...register("confirmPassword")}
+                {...registerField("confirmPassword")}
               />
               {errors.confirmPassword ? (
                 <p className="text-sm text-destructive">

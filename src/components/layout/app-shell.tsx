@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
   Bot,
@@ -9,8 +9,11 @@ import {
   LayoutDashboard,
   Leaf,
   ListChecks,
+  LogOut,
   Settings,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { clearToken } from "@/lib/auth/token";
 import { cn } from "@/lib/utils";
 
 const LAST_PROJECT_KEY = "agripilot:lastProjectId";
@@ -33,6 +36,7 @@ function isNavActive(pathname: string, href: string): boolean {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const projectIdFromPath = getProjectIdFromPath(pathname);
   const [activeProjectId, setActiveProjectId] = useState(DEFAULT_PROJECT_ID);
 
@@ -91,9 +95,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     });
   };
 
+  function handleLogout() {
+    clearToken();
+    router.replace("/login");
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <aside className="fixed inset-y-0 left-0 z-20 hidden w-72 border-r bg-card px-5 py-6 lg:block">
+      <aside className="fixed inset-y-0 left-0 z-20 hidden w-72 flex-col border-r bg-card px-5 py-6 lg:flex">
         <Link href="/dashboard" className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <Home className="h-5 w-5" />
@@ -126,9 +135,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+        <Button
+          type="button"
+          variant="ghost"
+          className="mt-auto w-full justify-start gap-3 px-3 text-muted-foreground"
+          onClick={handleLogout}
+        >
+          <LogOut className="h-4 w-4" />
+          Log out
+        </Button>
       </aside>
       <main className="pb-24 lg:pl-72">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <div className="mb-4 flex justify-end lg:hidden">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" />
+              Log out
+            </Button>
+          </div>
           {children}
         </div>
       </main>
