@@ -108,7 +108,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Home className="h-5 w-5" />
           </div>
           <div>
-            <p className="font-bold">AgriPilot</p>
+            <p className="font-bold">AgriPlus</p>
             <p className="text-xs text-muted-foreground">Guided farm planning</p>
           </div>
         </Link>

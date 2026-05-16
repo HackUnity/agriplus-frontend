@@ -31,7 +31,7 @@ export function DashboardContent() {
         }
       />
 
-      <Card className="bg-primary text-primary-foreground">
+      {/* <Card className="bg-primary text-primary-foreground">
         <CardContent className="grid gap-4 p-6 md:grid-cols-[1fr_auto] md:items-center">
           <div>
             <p className="text-sm font-semibold opacity-80">Recommended next action</p>
@@ -43,7 +43,7 @@ export function DashboardContent() {
             <Link href="/projects/demo-project/onboarding">Continue onboarding</Link>
           </Button>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

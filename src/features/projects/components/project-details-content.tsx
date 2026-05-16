@@ -40,7 +40,7 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
         actions={<ProjectStatusBadge status={project.status} />}
       />
 
-      <Card className="bg-muted">
+      {/* <Card className="bg-muted">
         <CardContent className="grid gap-4 p-6 md:grid-cols-[1fr_auto] md:items-center">
           <div>
             <p className="text-sm font-semibold text-primary">Next action</p>
@@ -56,7 +56,7 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
             </Link>
           </Button>
         </CardContent>
-      </Card>
+      </Card> */}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
