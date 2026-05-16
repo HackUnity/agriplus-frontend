@@ -30,7 +30,7 @@ export function PlanContent({ projectId }: { projectId: string }) {
       />
 
       {plan.phases && plan.phases.length > 0 ? (
-        <PlanPhases phases={plan.phases} />
+        <PlanPhases projectId={projectId} phases={plan.phases} />
       ) : (
         <p className="text-muted-foreground">No cultivation phases available yet.</p>
       )}

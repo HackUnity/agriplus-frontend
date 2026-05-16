@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
+  Bot,
   Camera,
   CheckCircle2,
   ChevronDown,
@@ -9,7 +11,9 @@ import {
   Clock,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { buildAskAiUrl } from "@/features/troubleshooting/utils/ask-ai-url";
 import type { PlanPhase } from "@/types/app.types";
 
 const PHASE_COLORS: {
@@ -49,10 +53,11 @@ function totalDays(phase: PlanPhase) {
 }
 
 interface PlanPhasesProps {
+  projectId: string;
   phases: PlanPhase[];
 }
 
-export function PlanPhases({ phases }: PlanPhasesProps) {
+export function PlanPhases({ projectId, phases }: PlanPhasesProps) {
   const [openIndex, setOpenIndex] = useState<number>(0);
 
   const toggle = (i: number) => setOpenIndex((prev) => (prev === i ? -1 : i));
@@ -135,15 +140,28 @@ export function PlanPhases({ phases }: PlanPhasesProps) {
                             {substage.description}
                           </p>
 
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                            <span>
-                              Est.{" "}
-                              <strong className="text-foreground">
-                                {substage.estimated_days}
-                              </strong>{" "}
-                              day{substage.estimated_days !== 1 ? "s" : ""}
-                            </span>
+                          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                              <span>
+                                Est.{" "}
+                                <strong className="text-foreground">
+                                  {substage.estimated_days}
+                                </strong>{" "}
+                                day{substage.estimated_days !== 1 ? "s" : ""}
+                              </span>
+                            </div>
+                            <Button asChild variant="outline" size="sm">
+                              <Link
+                                href={buildAskAiUrl(projectId, {
+                                  title: substage.title,
+                                  description: substage.description,
+                                })}
+                              >
+                                <Bot className="h-4 w-4" />
+                                Ask AI
+                              </Link>
+                            </Button>
                           </div>
                         </div>
                       </li>

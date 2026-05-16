@@ -38,7 +38,18 @@ function buildQuestionPayload(
   return parts.join("\n");
 }
 
-export function TroubleshootingChat({ projectId }: { projectId: string }) {
+type StepContext = {
+  title: string;
+  description: string;
+};
+
+export function TroubleshootingChat({
+  projectId,
+  stepContext,
+}: {
+  projectId: string;
+  stepContext?: StepContext;
+}) {
   const [question, setQuestion] = useState("");
   const [category, setCategory] = useState<DiagnosisCategory | null>(null);
   const [image, setImage] = useState<string | undefined>();
@@ -170,12 +181,20 @@ export function TroubleshootingChat({ projectId }: { projectId: string }) {
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Textarea
-                  value={question}
-                  onChange={(event) => setQuestion(event.target.value)}
-                  placeholder="Example: Tomato leaves turned yellow after heavy rain and growth became slow."
-                  className="min-h-24"
-                />
+                <div className="min-w-0 flex-1 space-y-2">
+                  {stepContext ? (
+                    <Label htmlFor="ask-ai-question" className="text-sm font-medium">
+                      {stepContext.title}
+                    </Label>
+                  ) : null}
+                  <Textarea
+                    id="ask-ai-question"
+                    value={question}
+                    onChange={(event) => setQuestion(event.target.value)}
+                    placeholder="Example: Tomato leaves turned yellow after heavy rain and growth became slow."
+                    className="min-h-24"
+                  />
+                </div>
                 <Button
                   type="submit"
                   disabled={loading}
