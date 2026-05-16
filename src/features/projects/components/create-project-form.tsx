@@ -9,9 +9,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  projectCountries,
+  sriLankaDistricts,
+} from "@/features/projects/constants";
+import {
+  createProjectDefaultValues,
   createProjectSchema,
   type CreateProjectValues,
 } from "@/features/projects/schemas/create-project.schema";
+
+const selectClassName =
+  "h-11 w-full rounded-md border bg-background px-3 text-sm";
 
 export function CreateProjectForm() {
   const router = useRouter();
@@ -21,9 +29,7 @@ export function CreateProjectForm() {
     formState: { errors, isSubmitting },
   } = useForm<CreateProjectValues>({
     resolver: zodResolver(createProjectSchema),
-    defaultValues: {
-      goal: "Grow food for home",
-    },
+    defaultValues: createProjectDefaultValues,
   });
 
   async function onSubmit(values: CreateProjectValues) {
@@ -52,12 +58,41 @@ export function CreateProjectForm() {
             ) : null}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
-            <Input
+            <Label htmlFor="country">Country</Label>
+            <select
+              id="country"
+              className={selectClassName}
+              {...register("country")}
+            >
+              {projectCountries.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+            {errors.country ? (
+              <p className="text-sm text-destructive">
+                {errors.country.message}
+              </p>
+            ) : null}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="location">Location (district)</Label>
+            <select
               id="location"
-              placeholder="Nearest town, district, or region"
+              className={selectClassName}
+              defaultValue=""
               {...register("location")}
-            />
+            >
+              <option value="" disabled>
+                Select district
+              </option>
+              {sriLankaDistricts.map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
+              ))}
+            </select>
             {errors.location ? (
               <p className="text-sm text-destructive">
                 {errors.location.message}
@@ -66,11 +101,7 @@ export function CreateProjectForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="goal">Main goal</Label>
-            <select
-              id="goal"
-              className="h-11 w-full rounded-md border bg-background px-3 text-sm"
-              {...register("goal")}
-            >
+            <select id="goal" className={selectClassName} {...register("goal")}>
               <option>Grow food for home</option>
               <option>Earn small income</option>
               <option>Learn farming basics</option>
