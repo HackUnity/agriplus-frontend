@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bot, Cuboid, FileText, ListChecks } from "lucide-react";
 import { PageHeader } from "@/components/common/page-header";
@@ -8,13 +9,20 @@ import { ProjectStatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { loadProgressGoals } from "@/features/progress/services/progress.service";
+import { countSubtasks } from "@/features/progress/utils/progress.utils";
 import { getProject } from "@/features/projects/services/projects.service";
 
 export function ProjectDetailsContent({ projectId }: { projectId: string }) {
+  const [readiness, setReadiness] = useState(0);
   const { data: project, isLoading } = useQuery({
     queryKey: ["project", projectId],
     queryFn: () => getProject(projectId),
   });
+
+  useEffect(() => {
+    setReadiness(Math.round(countSubtasks(loadProgressGoals(projectId)).percent));
+  }, [projectId]);
 
   if (isLoading) {
     return <p className="text-muted-foreground">Loading project...</p>;
@@ -62,7 +70,7 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
             title: "Progress tracker",
             icon: ListChecks,
             href: `/projects/${project.id}/progress`,
-            text: "Weekly steps with practical instructions.",
+            text: "Goals with sub-tasks and practical instructions.",
           },
           {
             title: "3D farm layout",
@@ -103,10 +111,10 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
           <CardTitle>Project readiness</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <Progress value={68} />
+          <Progress value={readiness} />
           <p className="text-sm text-muted-foreground">
-            Land profile and plan are available. Complete weekly tasks to
-            increase readiness.
+            Land profile and plan are available. Complete goal sub-tasks to
+            increase readiness ({readiness}%).
           </p>
         </CardContent>
       </Card>

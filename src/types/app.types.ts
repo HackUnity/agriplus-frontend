@@ -16,12 +16,19 @@ export type CropRecommendation = {
   timeline: string;
 };
 
-export type FarmingStep = {
+export type SubTask = {
+  id: string;
+  title: string;
+  status: StepStatus;
+};
+
+export type FarmingGoal = {
   id: string;
   title: string;
   timing: string;
   description: string;
   status: StepStatus;
+  subtasks: SubTask[];
 };
 
 export type FarmingPlan = {
@@ -32,7 +39,7 @@ export type FarmingPlan = {
   assumptions: string[];
   recommendations: CropRecommendation[];
   risks: string[];
-  steps: FarmingStep[];
+  goals: FarmingGoal[];
 };
 
 export type Project = {

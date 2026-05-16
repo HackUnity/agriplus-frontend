@@ -82,38 +82,58 @@ export const demoPlan: FarmingPlan = {
     "Poor drainage can damage roots after heavy rain.",
     "Starting too large may make weekly maintenance difficult.",
   ],
-  steps: [
+  goals: [
     {
-      id: "step-1",
+      id: "goal-1",
       title: "Mark the first growing zone",
       timing: "Day 1",
       description:
         "Start with a small section that you can water and observe daily. Keep walking paths clear.",
       status: "done",
+      subtasks: [
+        { id: "goal-1-a", title: "Measure plot boundaries", status: "done" },
+        { id: "goal-1-b", title: "Clear weeds from the zone", status: "done" },
+        { id: "goal-1-c", title: "Mark walking paths", status: "done" },
+      ],
     },
     {
-      id: "step-2",
+      id: "goal-2",
       title: "Prepare soil with compost",
       timing: "Days 2-4",
       description:
         "Loosen the top soil and mix compost evenly. Remove stones, weeds, and compacted clumps.",
       status: "doing",
+      subtasks: [
+        { id: "goal-2-a", title: "Loosen top 6 inches of soil", status: "done" },
+        { id: "goal-2-b", title: "Mix compost evenly", status: "doing" },
+        { id: "goal-2-c", title: "Remove stones and compacted clumps", status: "todo" },
+      ],
     },
     {
-      id: "step-3",
+      id: "goal-3",
       title: "Plant leafy greens first",
       timing: "Week 1",
       description:
         "Use simple rows with enough spacing to weed and water comfortably.",
       status: "todo",
+      subtasks: [
+        { id: "goal-3-a", title: "Soak seeds if needed", status: "todo" },
+        { id: "goal-3-b", title: "Mark simple rows with spacing", status: "todo" },
+        { id: "goal-3-c", title: "Plant and water gently", status: "todo" },
+      ],
     },
     {
-      id: "step-4",
+      id: "goal-4",
       title: "Check leaves and soil moisture",
       timing: "Weekly",
       description:
         "Look for yellowing, holes, pests, and dry soil. Ask the assistant if symptoms appear.",
       status: "todo",
+      subtasks: [
+        { id: "goal-4-a", title: "Morning soil moisture check", status: "todo" },
+        { id: "goal-4-b", title: "Inspect leaves for pests or yellowing", status: "todo" },
+        { id: "goal-4-c", title: "Log issues for the assistant", status: "todo" },
+      ],
     },
   ],
 };
