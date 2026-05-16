@@ -3,7 +3,8 @@ export type ProjectStatus =
   | "onboarding"
   | "generating"
   | "ready"
-  | "in_progress";
+  | "in_progress"
+  | "completed";
 
 export type StepStatus = "todo" | "doing" | "done" | "blocked";
 

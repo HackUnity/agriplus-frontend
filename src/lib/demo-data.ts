@@ -21,6 +21,26 @@ export const demoProjects: Project[] = [
     nextAction: "Finish land and water details",
     updatedAt: "Yesterday",
   },
+  {
+    id: "home-herbs-2025",
+    name: "Home Herb Patch 2025",
+    location: "Gampaha, Sri Lanka",
+    goal: "Year-round kitchen herbs for family use",
+    area: "120 sq ft",
+    status: "completed",
+    nextAction: "Review harvest notes and plan next season",
+    updatedAt: "2 weeks ago",
+  },
+  {
+    id: "rainfed-beans",
+    name: "Rainfed Bean Plot",
+    location: "Anuradhapura, Sri Lanka",
+    goal: "Dry-zone legume trial with minimal irrigation",
+    area: "0.1 acres",
+    status: "completed",
+    nextAction: "Archive season summary and rotate crop zone",
+    updatedAt: "Last month",
+  },
 ];
 
 export const demoPlan: FarmingPlan = {

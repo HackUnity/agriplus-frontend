@@ -7,11 +7,12 @@ const projectLabels: Record<ProjectStatus, string> = {
   generating: "Generating",
   ready: "Plan ready",
   in_progress: "In progress",
+  completed: "Completed",
 };
 
 export function ProjectStatusBadge({ status }: { status: ProjectStatus }) {
   const variant =
-    status === "ready" || status === "in_progress"
+    status === "ready" || status === "in_progress" || status === "completed"
       ? "success"
       : status === "generating"
         ? "warning"
