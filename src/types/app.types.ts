@@ -31,6 +31,20 @@ export type FarmingGoal = {
   subtasks: SubTask[];
 };
 
+export type PlanSubstage = {
+  step_number: number;
+  title: string;
+  description: string;
+  estimated_days: number;
+  requires_physical_action_image: boolean;
+  image_prompt_context: string | null;
+};
+
+export type PlanPhase = {
+  name: string;
+  substages: PlanSubstage[];
+};
+
 export type FarmingPlan = {
   id: string;
   projectId: string;
@@ -40,6 +54,7 @@ export type FarmingPlan = {
   recommendations: CropRecommendation[];
   risks: string[];
   goals: FarmingGoal[];
+  phases?: PlanPhase[];
 };
 
 export type Project = {
