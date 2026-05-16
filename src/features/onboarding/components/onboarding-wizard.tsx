@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { LandImageField } from "@/features/onboarding/components/land-image-field";
 import { onboardingSteps } from "@/features/onboarding/constants";
 import {
   onboardingSchema,
@@ -47,11 +48,15 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
     handleSubmit,
     trigger,
     getValues,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: { ...defaultValues, ...draft },
   });
+
+  const landImage = watch("landImage");
 
   async function goNext() {
     const valid = await trigger(step.fields);
@@ -134,6 +139,13 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
                 options={["Less than 4 hours", "4 to 6 hours", "6 or more hours"]}
                 registration={register("sunlight")}
                 error={errors.sunlight?.message}
+              />
+              <LandImageField
+                value={landImage}
+                onChange={(image) =>
+                  setValue("landImage", image, { shouldDirty: true })
+                }
+                error={errors.landImage?.message}
               />
             </>
           ) : null}
