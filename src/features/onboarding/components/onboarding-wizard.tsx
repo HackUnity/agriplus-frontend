@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, type UseFormRegisterReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -68,6 +68,17 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
     }
   }
 
+  async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (stepIndex < onboardingSteps.length - 1) {
+      await goNext();
+      return;
+    }
+
+    await handleSubmit(onSubmit)(event);
+  }
+
   async function onSubmit(values: OnboardingValues) {
     await saveLandDetails(projectId, values);
     const response = await fetch("/api/ai/generate-plan", {
@@ -88,7 +99,7 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
   }
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+    <form className="space-y-6" onSubmit={handleFormSubmit}>
       <Card>
         <CardHeader className="space-y-4">
           <div>
@@ -238,7 +249,7 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
               {isSubmitting ? "Generating plan..." : "Generate farming plan"}
             </Button>
           ) : (
-            <Button type="button" onClick={goNext}>
+            <Button type="submit" disabled={saving || isSubmitting}>
               Save and continue
             </Button>
           )}
