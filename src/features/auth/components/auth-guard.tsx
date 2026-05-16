@@ -9,10 +9,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!hasToken()) {
-      router.replace("/login");
-      return;
-    }
+    // TESTING: auth bypass — restore token check before shipping
+    // if (!hasToken()) {
+    //   router.replace("/login");
+    //   return;
+    // }
     setReady(true);
   }, [router]);
 

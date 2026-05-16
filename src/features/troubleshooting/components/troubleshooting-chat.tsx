@@ -5,7 +5,14 @@ import { Bot, Send, User } from "lucide-react";
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DiagnosisImageUpload } from "@/features/troubleshooting/components/diagnosis-image-upload";
+import { ProjectContextPanel } from "@/features/troubleshooting/components/project-context-panel";
+import {
+  DIAGNOSIS_CATEGORIES,
+  type DiagnosisCategory,
+} from "@/features/troubleshooting/constants";
 import { cn } from "@/lib/utils";
 
 type Message = {
@@ -20,8 +27,21 @@ const suggestions = [
   "What should I do if seeds do not germinate?",
 ];
 
+function buildQuestionPayload(
+  question: string,
+  category: DiagnosisCategory | null,
+) {
+  const parts = [question.trim()];
+  if (category) {
+    parts.push(`Category: ${category}`);
+  }
+  return parts.join("\n");
+}
+
 export function TroubleshootingChat({ projectId }: { projectId: string }) {
   const [question, setQuestion] = useState("");
+  const [category, setCategory] = useState<DiagnosisCategory | null>(null);
+  const [image, setImage] = useState<string | undefined>();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -32,6 +52,10 @@ export function TroubleshootingChat({ projectId }: { projectId: string }) {
   ]);
   const [loading, setLoading] = useState(false);
 
+  function selectCategory(next: DiagnosisCategory) {
+    setCategory((current) => (current === next ? null : next));
+  }
+
   async function sendMessage(event?: FormEvent) {
     event?.preventDefault();
     const trimmed = question.trim();
@@ -39,10 +63,12 @@ export function TroubleshootingChat({ projectId }: { projectId: string }) {
       return;
     }
 
+    const payload = buildQuestionPayload(trimmed, category);
+
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: "user",
-      content: trimmed,
+      content: payload,
     };
     setMessages((current) => [...current, userMessage]);
     setQuestion("");
@@ -51,7 +77,7 @@ export function TroubleshootingChat({ projectId }: { projectId: string }) {
     const response = await fetch("/api/ai/troubleshoot", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ projectId, question: trimmed }),
+      body: JSON.stringify({ projectId, question: payload }),
     });
     const data = (await response.json()) as { answer?: string };
 
@@ -95,7 +121,7 @@ export function TroubleshootingChat({ projectId }: { projectId: string }) {
                     ) : null}
                     <div
                       className={cn(
-                        "max-w-[85%] rounded-xl px-4 py-3 text-sm leading-6",
+                        "max-w-[85%] rounded-xl px-4 py-3 text-sm leading-6 whitespace-pre-wrap",
                         assistant
                           ? "bg-muted text-foreground"
                           : "bg-primary text-primary-foreground",
@@ -110,19 +136,56 @@ export function TroubleshootingChat({ projectId }: { projectId: string }) {
                 );
               })}
               {loading ? (
-                <p className="text-sm text-muted-foreground">AI is checking the plan context...</p>
+                <p className="text-sm text-muted-foreground">
+                  AI is checking the plan context...
+                </p>
               ) : null}
             </div>
-            <form className="flex flex-col gap-3 sm:flex-row" onSubmit={sendMessage}>
-              <Textarea
-                value={question}
-                onChange={(event) => setQuestion(event.target.value)}
-                placeholder="Describe the plant symptom or farming question..."
-                className="min-h-20"
-              />
-              <Button type="submit" disabled={loading}>
-                <Send className="h-4 w-4" /> Send
-              </Button>
+
+            <form className="space-y-5 border-t pt-5" onSubmit={sendMessage}>
+              <ProjectContextPanel projectId={projectId} />
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Quick diagnosis category</Label>
+                <div className="flex flex-wrap gap-2">
+                  {DIAGNOSIS_CATEGORIES.map((item) => {
+                    const active = category === item;
+                    return (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => selectCategory(item)}
+                        className={cn(
+                          "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+                          active
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background text-foreground hover:bg-muted",
+                        )}
+                      >
+                        {item}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Textarea
+                  value={question}
+                  onChange={(event) => setQuestion(event.target.value)}
+                  placeholder="Example: Tomato leaves turned yellow after heavy rain and growth became slow."
+                  className="min-h-24"
+                />
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="shrink-0 sm:self-end"
+                >
+                  <Send className="h-4 w-4" /> Send
+                </Button>
+              </div>
+
+              <DiagnosisImageUpload value={image} onChange={setImage} />
             </form>
           </CardContent>
         </Card>

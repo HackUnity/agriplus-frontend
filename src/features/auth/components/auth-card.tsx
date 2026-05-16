@@ -101,6 +101,11 @@ export function AuthCard({ mode }: { mode: "login" | "signup" | "forgot" }) {
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
+          {/* TESTING: login form disabled — restore before shipping */}
+          <Button className="w-full" asChild>
+            <Link href="/dashboard">Continue to dashboard (testing)</Link>
+          </Button>
+          {/*
           <form
             noValidate
             className="space-y-4"
@@ -148,6 +153,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" | "forgot" }) {
               {isSubmitting ? "Signing in…" : "Sign in"}
             </Button>
           </form>
+          */}
 
           <div className="space-y-2 text-center text-sm text-muted-foreground">
             <p>
