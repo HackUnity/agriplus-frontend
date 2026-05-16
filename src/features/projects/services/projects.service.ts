@@ -34,11 +34,8 @@ export async function listProjects(): Promise<Project[]> {
 }
 
 export async function getProject(projectId: string): Promise<Project | null> {
-  const demoProject =
-    demoProjects.find((project) => project.id === projectId) ?? demoProjects[0];
-
   if (!hasSupabaseEnv) {
-    return demoProject;
+    return demoProjects.find((project) => project.id === projectId) ?? null;
   }
 
   const supabase = createClient();

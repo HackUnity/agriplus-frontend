@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bot,
   Home,
@@ -12,20 +13,83 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/projects/demo-project", label: "Project", icon: Leaf },
-  { href: "/projects/demo-project/progress", label: "Steps", icon: ListChecks },
-  {
-    href: "/projects/demo-project/troubleshooting",
-    label: "Ask AI",
-    icon: Bot,
-  },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
+const LAST_PROJECT_KEY = "agripilot:lastProjectId";
+const DEFAULT_PROJECT_ID = "demo-project";
+
+function getProjectIdFromPath(pathname: string): string | null {
+  const match = pathname.match(/^\/projects\/([^/]+)/);
+  if (!match || match[1] === "new") {
+    return null;
+  }
+  return match[1];
+}
+
+function isNavActive(pathname: string, href: string): boolean {
+  if (href === "/dashboard" || href === "/settings") {
+    return pathname === href;
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const projectIdFromPath = getProjectIdFromPath(pathname);
+  const [activeProjectId, setActiveProjectId] = useState(DEFAULT_PROJECT_ID);
+
+  useEffect(() => {
+    if (projectIdFromPath) {
+      setActiveProjectId(projectIdFromPath);
+      window.localStorage.setItem(LAST_PROJECT_KEY, projectIdFromPath);
+      return;
+    }
+
+    const stored = window.localStorage.getItem(LAST_PROJECT_KEY);
+    if (stored) {
+      setActiveProjectId(stored);
+    }
+  }, [projectIdFromPath]);
+
+  const navItems = useMemo(
+    () => [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      {
+        href: `/projects/${activeProjectId}`,
+        label: "Project",
+        icon: Leaf,
+      },
+      {
+        href: `/projects/${activeProjectId}/progress`,
+        label: "Steps",
+        icon: ListChecks,
+      },
+      {
+        href: `/projects/${activeProjectId}/troubleshooting`,
+        label: "Ask AI",
+        icon: Bot,
+      },
+      { href: "/settings", label: "Settings", icon: Settings },
+    ],
+    [activeProjectId],
+  );
+
+  const logSidebarNavigation = (
+    label: string,
+    href: string,
+    placement: "sidebar" | "bottom-nav",
+  ) => {
+    const hrefProjectId = getProjectIdFromPath(href);
+    console.log("[AgriPilot] Sidebar click", {
+      placement,
+      label,
+      href,
+      pathname,
+      projectIdFromPath,
+      activeProjectId,
+      hrefProjectId,
+      inCorrectProjectContext:
+        hrefProjectId === null || hrefProjectId === activeProjectId,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -42,12 +106,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <nav className="mt-10 space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = pathname === item.href;
+            const active = isNavActive(pathname, item.href);
 
             return (
               <Link
-                key={item.href}
+                key={`${item.label}-${item.href}`}
                 href={item.href}
+                onClick={() =>
+                  logSidebarNavigation(item.label, item.href, "sidebar")
+                }
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
                   active && "bg-muted text-foreground",
@@ -68,12 +135,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-card lg:hidden">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const active = pathname === item.href;
+          const active = isNavActive(pathname, item.href);
 
           return (
             <Link
-              key={item.href}
+              key={`${item.label}-${item.href}`}
               href={item.href}
+              onClick={() =>
+                logSidebarNavigation(item.label, item.href, "bottom-nav")
+              }
               className={cn(
                 "flex flex-col items-center gap-1 px-2 py-3 text-[11px] font-medium text-muted-foreground",
                 active && "text-primary",
