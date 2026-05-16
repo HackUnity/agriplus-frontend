@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AuthApiError, login } from "@/lib/api/auth";
 import { setToken } from "@/lib/auth/token";
+import { marketplaceApi } from "@/features/marketplace/api";
 import {
   loginSchema,
   type LoginValues,
@@ -42,7 +43,13 @@ export function AuthCard({ mode }: { mode: "login" | "signup" | "forgot" }) {
     try {
       const token = await login(values);
       setToken(token.access_token);
-      router.push("/dashboard");
+      const { user } = await marketplaceApi.me();
+      const role = user?.role?.toLowerCase() ?? "";
+      if (role === "buyer") {
+        router.push("/marketplace-orders");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
       if (err instanceof AuthApiError) {
         setFormError(err.message);

@@ -11,9 +11,15 @@ import {
   ListChecks,
   LogOut,
   Settings,
+  Package,
+  ShoppingBag,
+  Store,
+  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { clearToken } from "@/lib/auth/token";
+import { useMarketplaceRole } from "@/features/marketplace/hooks/use-marketplace-role";
+import { useNotificationUnread } from "@/features/marketplace/hooks/use-notification-unread";
 import { cn } from "@/lib/utils";
 
 const LAST_PROJECT_KEY = "agripilot:lastProjectId";
@@ -28,7 +34,16 @@ function getProjectIdFromPath(pathname: string): string | null {
 }
 
 function isNavActive(pathname: string, href: string): boolean {
-  if (href === "/dashboard" || href === "/settings") {
+  if (href === "/#marketplace") {
+    return pathname === "/";
+  }
+  if (
+    href === "/dashboard" ||
+    href === "/settings" ||
+    href === "/sell" ||
+    href === "/marketplace-orders" ||
+    href === "/notifications"
+  ) {
     return pathname === href;
   }
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -37,6 +52,8 @@ function isNavActive(pathname: string, href: string): boolean {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { isFarmer, isBuyer } = useMarketplaceRole();
+  const unreadNotifications = useNotificationUnread();
   const projectIdFromPath = getProjectIdFromPath(pathname);
   const [activeProjectId, setActiveProjectId] = useState(DEFAULT_PROJECT_ID);
 
@@ -53,28 +70,59 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }
   }, [projectIdFromPath]);
 
-  const navItems = useMemo(
-    () => [
+  const notificationsNav = {
+    href: "/notifications",
+    label: "Notifications",
+    icon: Bell,
+    badge: unreadNotifications > 0 ? unreadNotifications : undefined,
+  };
+
+  const navItems = useMemo(() => {
+    if (isBuyer && !isFarmer) {
+      return [
+        {
+          href: "/marketplace-orders",
+          label: "My bids",
+          icon: Package,
+        },
+        { href: "/#marketplace", label: "Marketplace", icon: ShoppingBag },
+        notificationsNav,
+      ];
+    }
+
+    const items = [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      // {
-      //   href: `/projects/${activeProjectId}`,
-      //   label: "Project",
-      //   icon: Leaf,
-      // },
-      // {
-      //   href: `/projects/${activeProjectId}/progress`,
-      //   label: "Steps",
-      //   icon: ListChecks,
-      // },
-      // {
-      //   href: `/projects/${activeProjectId}/troubleshooting`,
-      //   label: "Ask AI",
-      //   icon: Bot,
-      // },
+      {
+        href: `/projects/${activeProjectId}`,
+        label: "Project",
+        icon: Leaf,
+      },
+      {
+        href: `/projects/${activeProjectId}/progress`,
+        label: "Steps",
+        icon: ListChecks,
+      },
+      {
+        href: `/projects/${activeProjectId}/troubleshooting`,
+        label: "Ask AI",
+        icon: Bot,
+      },
+    ];
+    if (isFarmer) {
+      items.push({ href: "/sell", label: "Sell", icon: Store });
+    }
+    items.push(
+      { href: "/#marketplace", label: "Marketplace", icon: ShoppingBag },
+      {
+        href: "/marketplace-orders",
+        label: isFarmer ? "Orders" : "My bids",
+        icon: Package,
+      },
+      notificationsNav,
       { href: "/settings", label: "Settings", icon: Settings },
-    ],
-    [activeProjectId],
-  );
+    );
+    return items;
+  }, [activeProjectId, isFarmer, isBuyer, unreadNotifications]);
 
   const logSidebarNavigation = (
     label: string,
@@ -103,19 +151,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-72 flex-col border-r bg-card px-5 py-6 lg:flex">
-        <Link href="/dashboard" className="flex items-center gap-3">
+        <Link
+          href={isBuyer && !isFarmer ? "/marketplace-orders" : "/dashboard"}
+          className="flex items-center gap-3"
+        >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <Home className="h-5 w-5" />
           </div>
           <div>
-            <p className="font-bold">AgriPlus</p>
-            <p className="text-xs text-muted-foreground">Guided farm planning</p>
+            <p className="font-bold">AgriPilot</p>
+            <p className="text-xs text-muted-foreground">
+              {isBuyer && !isFarmer ? "Marketplace buyer" : "Guided farm planning"}
+            </p>
           </div>
         </Link>
         <nav className="mt-10 space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isNavActive(pathname, item.href);
+            const badge = "badge" in item ? item.badge : undefined;
 
             return (
               <Link
@@ -130,7 +184,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 )}
               >
                 <Icon className="h-4 w-4" />
-                {item.label}
+                <span className="flex-1">{item.label}</span>
+                {badge != null && badge > 0 && (
+                  <span className="rounded-full bg-[#F59E0B] px-2 py-0.5 text-xs font-semibold text-white">
+                    {badge > 99 ? "99+" : badge}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -161,10 +220,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-card lg:hidden">
+      <nav
+        className="fixed inset-x-0 bottom-0 z-30 grid border-t bg-card lg:hidden"
+        style={{
+          gridTemplateColumns: `repeat(${navItems.length}, minmax(0, 1fr))`,
+        }}
+      >
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isNavActive(pathname, item.href);
+          const badge = "badge" in item ? item.badge : undefined;
 
           return (
             <Link
@@ -174,12 +239,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 logSidebarNavigation(item.label, item.href, "bottom-nav")
               }
               className={cn(
-                "flex flex-col items-center gap-1 px-2 py-3 text-[11px] font-medium text-muted-foreground",
+                "relative flex flex-col items-center gap-1 px-1 py-3 text-[10px] font-medium text-muted-foreground sm:text-[11px]",
                 active && "text-primary",
               )}
             >
               <Icon className="h-5 w-5" />
-              {item.label}
+              <span className="truncate">{item.label}</span>
+              {badge != null && badge > 0 && (
+                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#F59E0B] px-1 text-[9px] font-bold text-white">
+                  {badge > 9 ? "9+" : badge}
+                </span>
+              )}
             </Link>
           );
         })}
