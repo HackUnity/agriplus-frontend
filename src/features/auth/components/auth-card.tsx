@@ -61,7 +61,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" | "forgot" }) {
     mode === "login"
       ? "Welcome back"
       : mode === "signup"
-        ? "Create your AgriPilot account"
+        ? "Create your AgriPlus account"
         : "Reset your password";
 
   const description =
@@ -156,7 +156,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" | "forgot" }) {
 
           <div className="space-y-2 text-center text-sm text-muted-foreground">
             <p>
-              New to AgriPilot?{" "}
+              New to AgriPlus?{" "}
               <Link className="font-semibold text-primary" href="/signup">
                 Create an account
               </Link>

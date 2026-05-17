@@ -88,7 +88,7 @@ export function SignupForm() {
     <main className="flex min-h-screen items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Create your AgriPilot account</CardTitle>
+          <CardTitle>Create your AgriPlus account</CardTitle>
           <CardDescription>
             Start planning your first farming project in minutes.
           </CardDescription>

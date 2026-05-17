@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function getUrgencyClass(msLeft: number): string {
   const hours = msLeft / (1000 * 60 * 60);
-  if (hours <= 2) return "text-red-600 bg-red-50 border-red-200";
-  if (hours <= 12) return "text-amber-700 bg-amber-50 border-amber-200";
-  return "text-emerald-700 bg-emerald-50 border-emerald-200";
+  if (hours <= 2) return "bg-destructive/12 text-destructive border-destructive/30";
+  if (hours <= 12) return "bg-weather/25 text-foreground border-weather/40";
+  return "bg-growth/20 text-forest-deep border-growth/40";
 }
 
 export function BidCountdown({ endsAt }: { endsAt: string }) {
@@ -19,7 +20,7 @@ export function BidCountdown({ endsAt }: { endsAt: string }) {
       const ms = new Date(endsAt).getTime() - Date.now();
       if (ms <= 0) {
         setLabel("Ended");
-        setUrgency("text-muted-foreground bg-muted border-border");
+        setUrgency("bg-surface-muted text-muted-foreground border-border");
         return;
       }
       const h = Math.floor(ms / 3600000);
@@ -36,10 +37,11 @@ export function BidCountdown({ endsAt }: { endsAt: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold tabular-nums transition-colors",
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold tabular-nums transition-colors",
         urgency,
       )}
     >
+      <Clock className="h-3 w-3" />
       {label}
     </span>
   );

@@ -6,6 +6,8 @@ export type MarketplaceUser = {
   district: string;
 };
 
+export type ListingUnit = "kg" | "g" | "metric_ton" | "count";
+
 export type ListingCard = {
   id: string;
   title: string;
@@ -27,6 +29,7 @@ export type ListingCard = {
     name: string;
     minPriceKg: number;
     minPriceG: number;
+    minPriceCount?: number | null;
   };
   floorPricePerUnit: number;
   bidCount: number;
@@ -38,4 +41,5 @@ export type ProductCategory = {
   name: string;
   minPriceKg: number;
   minPriceG: number;
+  minPriceCount?: number | null;
 };

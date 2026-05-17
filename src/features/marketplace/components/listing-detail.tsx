@@ -3,12 +3,24 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, LayoutDashboard, MapPin, Truck } from "lucide-react";
+import {
+  ArrowLeft,
+  Gavel,
+  LayoutDashboard,
+  MapPin,
+  Truck,
+} from "lucide-react";
 import { hasToken } from "@/lib/auth/token";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { marketplaceApi } from "../api";
 import { useMarketplaceAuth } from "../context/marketplace-auth";
 import { AuthModal } from "./auth-modal";
@@ -42,7 +54,8 @@ export function ListingDetail({ listingId }: { listingId: string }) {
 
   const listing = data?.listing;
   const auctionClosed =
-    data?.auctionClosed || (listing?.status !== "ACTIVE" && listing?.status !== "PENDING_APPROVAL");
+    data?.auctionClosed ||
+    (listing?.status !== "ACTIVE" && listing?.status !== "PENDING_APPROVAL");
   const winnerName = data?.winnerName;
   const bids = bidsData?.bids ?? [];
   const current = listing?.currentBid ?? listing?.startPrice ?? 0;
@@ -80,14 +93,16 @@ export function ListingDetail({ listingId }: { listingId: string }) {
   }, [bidAmount, listing, listingId, queryClient, refetch, refetchBids]);
 
   if (isLoading || authLoading) {
-    return <p className="p-8 text-center text-muted-foreground">Loading…</p>;
+    return (
+      <p className="p-8 text-center text-muted-foreground">Loading…</p>
+    );
   }
 
   if (!listing) {
     return (
       <p className="p-8 text-center">
         Listing not found.{" "}
-        <Link href="/#marketplace" className="text-[#1B4332] underline">
+        <Link href="/#marketplace" className="font-semibold text-primary underline">
           Back to marketplace
         </Link>
       </p>
@@ -123,7 +138,7 @@ export function ListingDetail({ listingId }: { listingId: string }) {
             {isFarmer && (
               <Button asChild variant="outline" size="sm">
                 <Link href="/sell">
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <LayoutDashboard className="h-4 w-4" />
                   Sell dashboard
                 </Link>
               </Button>
@@ -135,39 +150,45 @@ export function ListingDetail({ listingId }: { listingId: string }) {
         )}
         <Button asChild variant="ghost" size="sm">
           <Link href="/#marketplace">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="h-4 w-4" />
             Back to marketplace
           </Link>
         </Button>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr]">
         <div>
-          <div className="overflow-hidden rounded-2xl bg-[#edf2e8]">
+          <div className="overflow-hidden rounded-2xl border border-border bg-mint">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={image} alt={listing.title} className="aspect-square w-full object-cover" />
+            <img
+              src={image}
+              alt={listing.title}
+              className="aspect-square w-full object-cover"
+            />
           </div>
           {listing.images.length > 1 && (
-            <div className="mt-2 flex gap-2 overflow-x-auto">
+            <div className="scroll-soft mt-3 flex gap-2 overflow-x-auto pb-2">
               {listing.images.map((src) => (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   key={src}
                   src={src}
                   alt=""
-                  className="h-16 w-16 rounded-lg object-cover"
+                  className="h-16 w-16 shrink-0 rounded-xl border border-border object-cover"
                 />
               ))}
             </div>
           )}
-          <p className="mt-6 text-muted-foreground">{listing.description}</p>
+          <p className="mt-6 leading-7 text-muted-foreground">
+            {listing.description}
+          </p>
         </div>
 
         <div className="space-y-6">
           {auctionClosed && (
-            <Card className="border-amber-300 bg-amber-50">
+            <Card className="border-warning/40 bg-weather/15">
               <CardContent className="p-4 text-sm">
-                <p className="font-semibold text-[#1B4332]">Auction ended</p>
+                <p className="font-semibold text-foreground">Auction ended</p>
                 <p className="mt-1 text-muted-foreground">
                   This listing is no longer on the marketplace.
                   {listing.status === "SOLD" && winnerName
@@ -179,7 +200,7 @@ export function ListingDetail({ listingId }: { listingId: string }) {
                 {user && (
                   <Link
                     href="/marketplace-orders"
-                    className="mt-2 inline-block text-[#1B4332] underline"
+                    className="mt-2 inline-block font-semibold text-primary underline"
                   >
                     Check My bids & orders
                   </Link>
@@ -187,58 +208,75 @@ export function ListingDetail({ listingId }: { listingId: string }) {
               </CardContent>
             </Card>
           )}
-          <div>
-            <BidCountdown endsAt={listing.bidEndsAt} />
-            <h1 className="mt-3 font-serif text-3xl font-bold text-[#1B4332]">
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <BidCountdown endsAt={listing.bidEndsAt} />
+              <Badge variant="soft" className="uppercase">
+                {listing.category.type}
+              </Badge>
+            </div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
               {listing.title}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {listing.category.type} · {listing.category.name}
+              {listing.category.name}
+            </p>
+            <p className="flex items-center gap-2 text-sm text-foreground">
+              <MapPin className="h-4 w-4 text-leaf" />
+              {listing.farmer.name} · {listing.district}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 text-sm">
-            <MapPin className="h-4 w-4" />
-            {listing.farmer.name} · {listing.district}
-          </div>
-
           <Card>
-            <CardContent className="grid grid-cols-2 gap-4 p-4 text-sm">
+            <CardContent className="grid grid-cols-2 gap-4 p-5 text-sm">
               <div>
-                <p className="text-muted-foreground">Current bid</p>
-                <p className="text-xl font-bold text-[#1B4332]">
-                  LKR {(listing.currentBid ?? listing.startPrice).toLocaleString()}
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Current bid
+                </p>
+                <p className="text-2xl font-extrabold text-primary">
+                  LKR{" "}
+                  {(listing.currentBid ?? listing.startPrice).toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Floor / unit</p>
-                <p className="font-medium">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Floor / unit
+                </p>
+                <p className="font-medium text-foreground">
                   LKR {listing.floorPricePerUnit.toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Quantity</p>
-                <p className="font-medium">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Quantity
+                </p>
+                <p className="font-medium text-foreground">
                   {listing.quantity} {listing.unit}
                 </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Bids</p>
-                <p className="font-medium">{listing.bidCount}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Bids
+                </p>
+                <p className="font-medium text-foreground">
+                  {listing.bidCount}
+                </p>
               </div>
             </CardContent>
           </Card>
 
           {user && distanceKm != null && (
-            <Card className="border-amber-200 bg-amber-50/50">
+            <Card className="border-water/30 bg-water/10">
               <CardContent className="flex gap-3 p-4 text-sm">
-                <Truck className="h-5 w-5 shrink-0 text-[#F59E0B]" />
+                <Truck className="h-5 w-5 shrink-0 text-info" />
                 <div>
-                  <p className="font-medium text-[#1B4332]">
+                  <p className="font-medium text-foreground">
                     ~{distanceKm} km from {user.district} to {listing.district}
                   </p>
                   <p className="text-muted-foreground">
-                    Est. transport: LKR {transportCost.toLocaleString()} (0.5 LKR/km/kg)
+                    Est. transport: LKR {transportCost.toLocaleString()} (0.5
+                    LKR/km/kg)
                   </p>
                 </div>
               </CardContent>
@@ -246,13 +284,18 @@ export function ListingDetail({ listingId }: { listingId: string }) {
           )}
 
           {isOwnListing && (
-            <p className="text-sm text-amber-800">
-              You cannot bid on your own listing. Other farmers and buyers can bid.
+            <p className="rounded-xl bg-weather/20 px-3 py-2 text-sm text-foreground">
+              You cannot bid on your own listing. Other farmers and buyers can
+              bid.
             </p>
           )}
-          <div>
+
+          <div className="rounded-2xl border border-border bg-surface p-4">
             <p className="mb-2 text-sm text-muted-foreground">
-              Suggested bid: LKR {suggested.toLocaleString()}
+              Suggested bid:{" "}
+              <span className="font-semibold text-foreground">
+                LKR {suggested.toLocaleString()}
+              </span>
             </p>
             <div className="flex gap-2">
               <Input
@@ -262,33 +305,37 @@ export function ListingDetail({ listingId }: { listingId: string }) {
                 onChange={(e) => setBidAmount(e.target.value)}
               />
               <Button
-                className="bg-[#1B4332] hover:bg-[#2d6a4f]"
                 onClick={openBidFlow}
-                disabled={auctionClosed || listing.status !== "ACTIVE" || isOwnListing}
+                disabled={
+                  auctionClosed ||
+                  listing.status !== "ACTIVE" ||
+                  isOwnListing
+                }
               >
+                <Gavel className="h-4 w-4" />
                 {isOwnListing ? "Your listing" : "Place bid"}
               </Button>
             </div>
           </div>
 
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-2">
               <CardTitle className="text-base">Bid history</CardTitle>
             </CardHeader>
-            <CardContent className="max-h-48 overflow-y-auto p-0">
+            <CardContent className="max-h-56 overflow-y-auto p-0">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-muted-foreground">
-                    <th className="p-3">Bidder</th>
-                    <th className="p-3">Amount</th>
-                    <th className="p-3">Time</th>
+                  <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+                    <th className="p-3 font-semibold">Bidder</th>
+                    <th className="p-3 font-semibold">Amount</th>
+                    <th className="p-3 font-semibold">Time</th>
                   </tr>
                 </thead>
                 <tbody>
                   {bids.map((b) => (
-                    <tr key={b.id} className="border-b">
-                      <td className="p-3">{b.bidderLabel}</td>
-                      <td className="p-3 font-medium">
+                    <tr key={b.id} className="border-b border-border last:border-0">
+                      <td className="p-3 text-foreground">{b.bidderLabel}</td>
+                      <td className="p-3 font-semibold text-foreground">
                         LKR {b.amount.toLocaleString()}
                       </td>
                       <td className="p-3 text-muted-foreground">
@@ -296,6 +343,16 @@ export function ListingDetail({ listingId }: { listingId: string }) {
                       </td>
                     </tr>
                   ))}
+                  {bids.length === 0 && (
+                    <tr>
+                      <td
+                        className="p-4 text-center text-sm text-muted-foreground"
+                        colSpan={3}
+                      >
+                        No bids yet — be the first.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </CardContent>
@@ -304,28 +361,41 @@ export function ListingDetail({ listingId }: { listingId: string }) {
       </div>
 
       {confirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="max-w-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm">
+          <Card className="max-w-md border-border bg-surface shadow-[var(--shadow-lift)]">
             <CardHeader>
               <CardTitle>Confirm your bid</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
-              <p>
-                You are bidding <strong>LKR {Number(bidAmount).toLocaleString()}</strong> for{" "}
-                {listing.quantity} {listing.unit} of {listing.title} from {listing.district}.
+              <p className="text-muted-foreground">
+                You are bidding{" "}
+                <strong className="text-foreground">
+                  LKR {Number(bidAmount).toLocaleString()}
+                </strong>{" "}
+                for {listing.quantity} {listing.unit} of{" "}
+                <strong className="text-foreground">{listing.title}</strong>{" "}
+                from {listing.district}.
               </p>
-              <p>Estimated transport: LKR {transportCost.toLocaleString()}</p>
-              <p className="font-semibold">
-                Total estimated cost: LKR {totalEstimate.toLocaleString()}
-              </p>
+              <div className="rounded-xl bg-surface-muted p-3">
+                <p className="text-muted-foreground">
+                  Estimated transport:{" "}
+                  <span className="font-medium text-foreground">
+                    LKR {transportCost.toLocaleString()}
+                  </span>
+                </p>
+                <p className="mt-1 font-semibold text-foreground">
+                  Total estimated cost: LKR {totalEstimate.toLocaleString()}
+                </p>
+              </div>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setConfirmOpen(false)}
+                >
                   Cancel
                 </Button>
-                <Button
-                  className="bg-[#1B4332]"
-                  onClick={() => void placeBid()}
-                >
+                <Button className="flex-1" onClick={() => void placeBid()}>
                   Confirm bid
                 </Button>
               </div>

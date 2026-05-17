@@ -15,7 +15,7 @@ export function ProfileSettings() {
     <div className="mx-auto max-w-3xl space-y-8">
       <PageHeader
         title="Settings and profile"
-        description="Manage the basic profile details that help AgriPilot adjust explanations for your farming experience."
+        description="Manage the basic profile details that help AgriPlus adjust explanations for your farming experience."
       />
       <Card>
         <CardHeader>

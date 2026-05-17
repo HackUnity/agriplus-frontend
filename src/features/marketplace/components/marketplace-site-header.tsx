@@ -50,13 +50,13 @@ export function MarketplaceSiteHeader({ embedded = false }: MarketplaceSiteHeade
     : "/";
   const logoLabel =
     loggedIn && isFarmer
-      ? "AgriPilot · Dashboard"
+      ? "AgriPlus · Dashboard"
       : loggedIn && !isFarmer
-        ? "AgriPilot · My bids"
-        : "AgriPilot";
+        ? "AgriPlus · My bids"
+        : "AgriPlus";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#d9e2d2]/80 bg-[#faf8f3]/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-2 sm:gap-4">
           {embedded && loggedIn && (
@@ -67,13 +67,18 @@ export function MarketplaceSiteHeader({ embedded = false }: MarketplaceSiteHeade
               </Link>
             </Button>
           )}
-          <Link href={homeHref} className="flex min-w-0 items-center gap-2">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#1B4332] text-white">
+          <Link href={homeHref} className="flex min-w-0 items-center gap-2.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <Leaf className="h-5 w-5" />
             </div>
-            <span className="truncate font-serif text-lg font-bold text-[#1B4332]">
-              {logoLabel}
-            </span>
+            <div className="flex min-w-0 flex-col leading-tight">
+              <span className="truncate text-lg font-extrabold text-foreground">
+                {logoLabel}
+              </span>
+              <span className="hidden text-[11px] font-semibold uppercase tracking-[0.15em] text-leaf sm:block">
+                Fresh produce auctions
+              </span>
+            </div>
           </Link>
         </div>
 
@@ -90,13 +95,21 @@ export function MarketplaceSiteHeader({ embedded = false }: MarketplaceSiteHeade
                   className="hidden sm:inline-flex"
                 >
                   <Link href="/sell">
-                    <Store className="mr-1 h-4 w-4" />
+                    <Store className="h-4 w-4" />
                     Sell
                   </Link>
                 </Button>
               )}
               <Button asChild variant="ghost" size="sm">
                 <Link href="/#marketplace">Marketplace</Link>
+              </Button>
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="hidden sm:inline-flex"
+              >
+                <Link href="/about">About</Link>
               </Button>
               {!isFarmer && (
                 <>
@@ -113,13 +126,9 @@ export function MarketplaceSiteHeader({ embedded = false }: MarketplaceSiteHeade
                   <Link href="/notifications">Notifications</Link>
                 </Button>
               )}
-              <Button
-                asChild
-                size="sm"
-                className="bg-[#1B4332] hover:bg-[#2d6a4f]"
-              >
+              <Button asChild size="sm">
                 <Link href={isFarmer ? "/dashboard" : "/marketplace-orders"}>
-                  <LayoutDashboard className="mr-1 h-4 w-4 sm:inline" />
+                  <LayoutDashboard className="h-4 w-4 sm:inline" />
                   <span className="max-w-[100px] truncate sm:max-w-none">
                     {userName ? `Hi, ${userName.split(" ")[0]}` : "Account"}
                   </span>
@@ -131,13 +140,16 @@ export function MarketplaceSiteHeader({ embedded = false }: MarketplaceSiteHeade
               <Button asChild variant="ghost" size="sm">
                 <a href={embedded ? "/#marketplace" : "#marketplace"}>Marketplace</a>
               </Button>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/about">About</Link>
+              </Button>
               <Button asChild variant="outline" size="sm">
                 <Link href="/login">Sign in</Link>
               </Button>
               <Button
                 asChild
                 size="sm"
-                className="hidden bg-[#1B4332] hover:bg-[#2d6a4f] sm:inline-flex"
+                className="hidden sm:inline-flex"
               >
                 <Link href="/signup">Get started</Link>
               </Button>

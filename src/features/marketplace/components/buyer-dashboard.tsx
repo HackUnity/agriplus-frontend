@@ -178,21 +178,26 @@ export function BuyerDashboard() {
       )}
 
       <section>
-        <h2 className="mb-4 flex items-center gap-2 font-serif text-xl font-semibold text-[#1B4332]">
-          <Gavel className="h-5 w-5 text-[#F59E0B]" />
+        <h2 className="mb-2 flex items-center gap-2 text-2xl font-bold text-foreground">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-mint text-primary">
+            <Gavel className="h-4.5 w-4.5" />
+          </span>
           My active bids
         </h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          Auctions you are bidding on. You can withdraw a bid before the auction ends
-          (remove only — not edit).
+          Auctions you are bidding on. You can withdraw a bid before the auction
+          ends (remove only — not edit).
         </p>
         {bidsLoading ? (
           <p className="text-sm text-muted-foreground">Loading bids…</p>
         ) : myBids.length === 0 ? (
           <Card className="border-dashed">
-            <CardContent className="py-8 text-center text-sm text-muted-foreground">
+            <CardContent className="py-10 text-center text-sm text-muted-foreground">
               No active bids.{" "}
-              <Link href="/#marketplace" className="text-[#1B4332] underline">
+              <Link
+                href="/#marketplace"
+                className="font-semibold text-primary underline"
+              >
                 Browse the marketplace
               </Link>
             </CardContent>
@@ -200,28 +205,32 @@ export function BuyerDashboard() {
         ) : (
           <div className="space-y-3">
             {myBids.map((b) => (
-              <Card key={b.id} className="border-[#d9e2d2]">
+              <Card key={b.id}>
                 <CardContent className="flex flex-wrap items-start justify-between gap-4 p-4">
-                  <div className="min-w-0 flex-1 space-y-1">
+                  <div className="min-w-0 flex-1 space-y-1.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold text-[#1B4332]">{b.listing.title}</p>
-                      {b.isLeading && (
-                        <Badge className="bg-emerald-100 text-emerald-800">
-                          Leading
-                        </Badge>
-                      )}
+                      <p className="font-semibold text-foreground">
+                        {b.listing.title}
+                      </p>
+                      {b.isLeading && <Badge variant="success">Leading</Badge>}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Your bid: LKR {b.amount.toLocaleString()} · {b.listing.district}
+                      Your bid:{" "}
+                      <span className="font-semibold text-foreground">
+                        LKR {b.amount.toLocaleString()}
+                      </span>{" "}
+                      · {b.listing.district}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Current high: LKR{" "}
-                      {(b.listing.currentBid ?? b.listing.startPrice).toLocaleString()}
+                      {(
+                        b.listing.currentBid ?? b.listing.startPrice
+                      ).toLocaleString()}
                     </p>
                     <BidCountdown endsAt={b.listing.bidEndsAt} />
                     <Link
                       href={`/marketplace/${b.listing.id}`}
-                      className="text-xs text-[#1B4332] underline"
+                      className="text-xs font-semibold text-primary underline"
                     >
                       View listing
                     </Link>
@@ -231,11 +240,11 @@ export function BuyerDashboard() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="shrink-0 text-destructive hover:text-destructive"
+                      className="shrink-0 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
                       disabled={removingBidId === b.id}
                       onClick={() => void removeBid(b.id)}
                     >
-                      <Trash2 className="mr-1 h-4 w-4" />
+                      <Trash2 className="h-4 w-4" />
                       {removingBidId === b.id ? "Removing…" : "Remove bid"}
                     </Button>
                   )}
@@ -247,9 +256,11 @@ export function BuyerDashboard() {
       </section>
 
       <section>
-        <h2 className="mb-4 flex items-center gap-2 font-serif text-xl font-semibold text-[#1B4332]">
-          <Trophy className="h-5 w-5 text-[#F59E0B]" />
-          Won auctions — claim & pay
+        <h2 className="mb-2 flex items-center gap-2 text-2xl font-bold text-foreground">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-weather/25 text-foreground">
+            <Trophy className="h-4.5 w-4.5" />
+          </span>
+          Won auctions — claim &amp; pay
         </h2>
         <p className="mb-4 text-sm text-muted-foreground">
           After an auction ends, confirm your purchase and pay the 20% downpayment
@@ -257,7 +268,7 @@ export function BuyerDashboard() {
         </p>
         {wonOrders.length === 0 ? (
           <Card className="border-dashed">
-            <CardContent className="py-8 text-center text-sm text-muted-foreground">
+            <CardContent className="py-10 text-center text-sm text-muted-foreground">
               No won auctions yet. When you win, they appear here automatically.
             </CardContent>
           </Card>
@@ -267,37 +278,47 @@ export function BuyerDashboard() {
               <Card key={o.id}>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base">{o.listing.title}</CardTitle>
-                  <p className="text-xs text-muted-foreground">{o.listing.district}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {o.listing.district}
+                  </p>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
                   <p>
                     Status:{" "}
-                    <span className="font-medium capitalize">
+                    <span className="font-semibold capitalize text-foreground">
                       {o.status.replace(/_/g, " ").toLowerCase()}
                     </span>
                   </p>
-                  <p>Winning bid: LKR {o.winningBid.toLocaleString()}</p>
-                  <p>Transport est.: LKR {o.transportCost.toLocaleString()}</p>
-                  <p className="font-medium">
+                  <p>
+                    Winning bid:{" "}
+                    <span className="font-semibold text-foreground">
+                      LKR {o.winningBid.toLocaleString()}
+                    </span>
+                  </p>
+                  <p>
+                    Transport est.: LKR {o.transportCost.toLocaleString()}
+                  </p>
+                  <p className="font-semibold text-foreground">
                     Total est.: LKR {o.totalEstimate.toLocaleString()}
                   </p>
                   {o.downpaymentAmount != null && (
-                    <p>20% downpayment: LKR {o.downpaymentAmount.toLocaleString()}</p>
+                    <p>
+                      20% downpayment: LKR{" "}
+                      {o.downpaymentAmount.toLocaleString()}
+                    </p>
                   )}
                   {o.status === "BID_WON" && (
                     <Button
                       size="sm"
-                      className="bg-[#1B4332]"
                       onClick={() => void confirmPurchase(o.id)}
                     >
-                      Claim & confirm purchase
+                      Claim &amp; confirm purchase
                     </Button>
                   )}
                   {o.status === "PAYMENT_PENDING" && (
                     <div className="flex flex-wrap gap-2">
                       <Button
                         size="sm"
-                        className="bg-[#1B4332]"
                         disabled={payingOrderId === o.id}
                         onClick={() => void startPayhere(o.id)}
                       >
@@ -316,7 +337,7 @@ export function BuyerDashboard() {
                     </div>
                   )}
                   {o.status === "PAYMENT_CONFIRMED" && (
-                    <p className="text-emerald-700">
+                    <p className="text-success">
                       Downpayment received — awaiting farmer dispatch.
                     </p>
                   )}

@@ -21,7 +21,7 @@ export function DashboardContent() {
     <div className="space-y-8">
       <PageHeader
         title="Your farming projects"
-        description="Create projects for each land area, then AgriPilot will guide planning, crop selection, tasks, and troubleshooting."
+        description="Create projects for each land area, then AgriPlus will guide planning, crop selection, tasks, and troubleshooting."
         actions={
           <Button asChild>
             <Link href="/projects/new">

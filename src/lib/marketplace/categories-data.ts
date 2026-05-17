@@ -24,6 +24,7 @@ export const CATEGORIES_BY_TYPE: Record<ProductType, string[]> = {
     "Citrus",
     "Berries",
     "Stone Fruits",
+    "Coconut",
     "Other Fruits",
   ],
   Grains: ["Rice", "Maize", "Wheat", "Millet", "Other Grains"],
@@ -32,11 +33,17 @@ export const CATEGORIES_BY_TYPE: Record<ProductType, string[]> = {
   Other: ["Miscellaneous"],
 };
 
-/** Seed floor prices (LKR per kg) — authority-set minimums. */
+/**
+ * Seed floor prices — authority-set minimums.
+ *  - `minPriceKg`: per kilogram (always set)
+ *  - `minPriceCount`: per piece for items sold by count (e.g. coconut). When
+ *    omitted, the category cannot be listed with unit="count".
+ */
 export const FLOOR_PRICE_SEED: {
   type: ProductType;
   name: string;
   minPriceKg: number;
+  minPriceCount?: number;
 }[] = [
   { type: "Vegetables", name: "Leafy Vegetables", minPriceKg: 180 },
   { type: "Vegetables", name: "Root Vegetables", minPriceKg: 120 },
@@ -48,6 +55,7 @@ export const FLOOR_PRICE_SEED: {
   { type: "Fruits", name: "Citrus", minPriceKg: 180 },
   { type: "Fruits", name: "Berries", minPriceKg: 400 },
   { type: "Fruits", name: "Stone Fruits", minPriceKg: 350 },
+  { type: "Fruits", name: "Coconut", minPriceKg: 130, minPriceCount: 190 },
   { type: "Fruits", name: "Other Fruits", minPriceKg: 200 },
   { type: "Grains", name: "Rice", minPriceKg: 95 },
   { type: "Grains", name: "Maize", minPriceKg: 70 },
