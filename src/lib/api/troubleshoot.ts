@@ -1,4 +1,3 @@
-import { demoPlanPhases } from "@/lib/demo-data";
 import { loadPipelineResult } from "@/features/plans/services/pipeline-storage.service";
 
 export type AskExpertPayload = {
@@ -7,21 +6,13 @@ export type AskExpertPayload = {
   targetedStepDescription?: string;
 };
 
-export function buildCultivationPlanForExpert(
+export async function buildCultivationPlanForExpert(
   projectId: string,
-): Record<string, unknown> | null {
-  const pipeline = loadPipelineResult(projectId);
+): Promise<Record<string, unknown> | null> {
+  const pipeline = await loadPipelineResult(projectId);
   if (pipeline?.plan?.phases?.length) {
     return pipeline.plan as Record<string, unknown>;
   }
-
-  if (demoPlanPhases.length > 0) {
-    return {
-      phases: demoPlanPhases,
-      crop: "mixed vegetables (demo plan)",
-    };
-  }
-
   return null;
 }
 

@@ -1,11 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Cuboid } from "lucide-react";
 import { PageHeader } from "@/components/common/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { loadPipelineLayout } from "@/features/plans/services/pipeline-storage.service";
+import type { FarmLayout } from "@/types/pipeline.types";
 
 const FarmScene = dynamic(
   () =>
@@ -23,7 +24,20 @@ const FarmScene = dynamic(
 );
 
 function FarmPrototypePanel({ projectId }: { projectId: string }) {
-  const layout = useMemo(() => loadPipelineLayout(projectId), [projectId]);
+  const [layout, setLayout] = useState<FarmLayout | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadPipelineLayout(projectId).then((loaded) => {
+      if (!cancelled) {
+        setLayout(loaded);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
+
   const elementCount = layout?.elements?.length ?? 0;
 
   return (
@@ -52,13 +66,10 @@ function FarmPrototypePanel({ projectId }: { projectId: string }) {
               <p>Blue lines = irrigation. Brown lines = paths.</p>
             </>
           ) : (
-            <>
-              <p>Project ID: {projectId}</p>
-              <p>Green zones show starter crop beds (demo layout).</p>
-              <p>The front strip represents a walking path for access.</p>
-              <p>The blue marker represents a water source or filling point.</p>
-              <p>Complete onboarding with a land photo to generate a custom 3D layout.</p>
-            </>
+            <p>
+              Complete onboarding with a land photo to generate a custom 3D layout
+              for this project.
+            </p>
           )}
         </CardContent>
       </Card>

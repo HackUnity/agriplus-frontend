@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Bot,
   Home,
@@ -20,10 +21,10 @@ import { Button } from "@/components/ui/button";
 import { clearToken } from "@/lib/auth/token";
 import { useMarketplaceRole } from "@/features/marketplace/hooks/use-marketplace-role";
 import { useNotificationUnread } from "@/features/marketplace/hooks/use-notification-unread";
+import { listProjects } from "@/features/projects/services/projects.service";
 import { cn } from "@/lib/utils";
 
 const LAST_PROJECT_KEY = "agripilot:lastProjectId";
-const DEFAULT_PROJECT_ID = "demo-project";
 
 function getProjectIdFromPath(pathname: string): string | null {
   const match = pathname.match(/^\/projects\/([^/]+)/);
@@ -55,7 +56,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { isFarmer, isBuyer } = useMarketplaceRole();
   const unreadNotifications = useNotificationUnread();
   const projectIdFromPath = getProjectIdFromPath(pathname);
-  const [activeProjectId, setActiveProjectId] = useState(DEFAULT_PROJECT_ID);
+  const { data: projects = [] } = useQuery({
+    queryKey: ["projects"],
+    queryFn: listProjects,
+    enabled: !isBuyer || isFarmer,
+  });
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
 
   useEffect(() => {
     if (projectIdFromPath) {
@@ -65,10 +71,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }
 
     const stored = window.localStorage.getItem(LAST_PROJECT_KEY);
-    if (stored) {
+    if (stored && projects.some((p) => p.id === stored)) {
       setActiveProjectId(stored);
+      return;
     }
-  }, [projectIdFromPath]);
+
+    if (projects[0]) {
+      setActiveProjectId(projects[0].id);
+    } else {
+      setActiveProjectId(null);
+    }
+  }, [projectIdFromPath, projects]);
 
   const notificationsNav = {
     href: "/notifications",
@@ -90,20 +103,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       ];
     }
 
+    const projectBase = activeProjectId
+      ? `/projects/${activeProjectId}`
+      : "/projects/new";
     const items = [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       {
-        href: `/projects/${activeProjectId}`,
+        href: projectBase,
         label: "Project",
         icon: Leaf,
       },
       {
-        href: `/projects/${activeProjectId}/progress`,
+        href: activeProjectId
+          ? `/projects/${activeProjectId}/progress`
+          : "/projects/new",
         label: "Steps",
         icon: ListChecks,
       },
       {
-        href: `/projects/${activeProjectId}/troubleshooting`,
+        href: activeProjectId
+          ? `/projects/${activeProjectId}/troubleshooting`
+          : "/projects/new",
         label: "Ask AI",
         icon: Bot,
       },

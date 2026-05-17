@@ -1,30 +1,24 @@
-import { demoPlan } from "@/lib/demo-data";
+import { getProjectApi, saveProgressGoalsApi } from "@/lib/api/projects";
 import { syncGoalStatuses } from "@/features/progress/utils/progress.utils";
 import type { FarmingGoal } from "@/types/app.types";
 
-const storageKey = (projectId: string) => `agripilot:progress:${projectId}`;
-
-export function loadProgressGoals(projectId: string): FarmingGoal[] {
-  if (typeof window === "undefined") {
-    return syncGoalStatuses(demoPlan.goals);
-  }
-
-  const saved = window.localStorage.getItem(storageKey(projectId));
-  if (!saved) {
-    return syncGoalStatuses(demoPlan.goals);
-  }
-
+export async function loadProgressGoals(
+  projectId: string,
+): Promise<FarmingGoal[]> {
   try {
-    return syncGoalStatuses(JSON.parse(saved) as FarmingGoal[]);
+    const project = await getProjectApi(projectId);
+    if (project.progress_goals?.length) {
+      return syncGoalStatuses(project.progress_goals);
+    }
   } catch {
-    return syncGoalStatuses(demoPlan.goals);
+    // fall through
   }
+  return [];
 }
 
-export function saveProgressGoals(projectId: string, goals: FarmingGoal[]) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.localStorage.setItem(storageKey(projectId), JSON.stringify(goals));
+export async function saveProgressGoals(
+  projectId: string,
+  goals: FarmingGoal[],
+) {
+  await saveProgressGoalsApi(projectId, goals);
 }

@@ -1,35 +1,23 @@
-import { hasSupabaseEnv } from "@/lib/env";
-import { createClient } from "@/lib/supabase/client";
+import {
+  getProjectApi,
+  saveLandDetailsApi,
+} from "@/lib/api/projects";
 import type { OnboardingValues } from "@/features/onboarding/schemas/onboarding.schema";
-import type { Json } from "@/types/database.types";
-
-const storageKey = (projectId: string) => `agripilot:onboarding:${projectId}`;
 
 export async function saveLandDetails(
   projectId: string,
   values: OnboardingValues,
 ) {
-  if (!hasSupabaseEnv) {
-    window.localStorage.setItem(storageKey(projectId), JSON.stringify(values));
-    return;
-  }
-
-  const supabase = createClient();
-  const { error } = await supabase.from("project_land_details").upsert({
-    project_id: projectId,
-    details: values as unknown as Json,
-  });
-
-  if (error) {
-    throw error;
-  }
+  await saveLandDetailsApi(projectId, values);
 }
 
-export function loadDraft(projectId: string): Partial<OnboardingValues> {
-  if (typeof window === "undefined") {
+export async function loadLandDetails(
+  projectId: string,
+): Promise<Partial<OnboardingValues>> {
+  try {
+    const project = await getProjectApi(projectId);
+    return (project.land_details ?? {}) as Partial<OnboardingValues>;
+  } catch {
     return {};
   }
-
-  const draft = window.localStorage.getItem(storageKey(projectId));
-  return draft ? (JSON.parse(draft) as Partial<OnboardingValues>) : {};
 }

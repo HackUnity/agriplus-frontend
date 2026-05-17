@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, type UseFormRegisterReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,9 +21,10 @@ import {
   type OnboardingValues,
 } from "@/features/onboarding/schemas/onboarding.schema";
 import {
-  loadDraft,
+  loadLandDetails,
   saveLandDetails,
 } from "@/features/onboarding/services/land-details.service";
+import { setProjectStatusApi } from "@/lib/api/projects";
 import {
   CropSelectionError,
   dataUrlToFile,
@@ -53,7 +54,7 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
   const [generatingPlan, setGeneratingPlan] = useState(false);
   const [pendingCropName, setPendingCropName] = useState<string | undefined>();
   const { status: apiStatus } = usePlanningApiStatus();
-  const draft = useMemo(() => loadDraft(projectId), [projectId]);
+  const [draftLoaded, setDraftLoaded] = useState(false);
   const step = onboardingSteps[stepIndex];
 
   const {
@@ -63,11 +64,25 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
     getValues,
     setValue,
     watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
-    defaultValues: { ...defaultValues, ...draft },
+    defaultValues,
   });
+
+  useEffect(() => {
+    let cancelled = false;
+    loadLandDetails(projectId).then((draft) => {
+      if (!cancelled) {
+        reset({ ...defaultValues, ...draft });
+        setDraftLoaded(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId, reset]);
 
   const landImage = watch("landImage");
 
@@ -127,9 +142,10 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
     setGeneratingPlan(true);
 
     try {
+      await setProjectStatusApi(projectId, "generating");
       const imageFile = dataUrlToFile(values.landImage);
       const result = await runAgronomyPipeline(imageFile, manualInputs);
-      savePipelineResult(projectId, result);
+      await savePipelineResult(projectId, result);
       toast.success("Farming plan generated", {
         description: result.plan.crop
           ? `Personalized plan for ${result.plan.crop}.`
@@ -149,7 +165,11 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
     }
   }
 
-  const busy = saving || isSubmitting || generatingPlan;
+  const busy = saving || isSubmitting || generatingPlan || !draftLoaded;
+
+  if (!draftLoaded) {
+    return <p className="text-muted-foreground">Loading your saved answers...</p>;
+  }
 
   return (
     <>

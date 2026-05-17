@@ -1,18 +1,21 @@
 "use client";
 
-import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CloudSun, Leaf, MapPin, Timer } from "lucide-react";
-import { loadDraft } from "@/features/onboarding/services/land-details.service";
+import type { OnboardingValues } from "@/features/onboarding/schemas/onboarding.schema";
+import { getProjectApi } from "@/lib/api/projects";
 import { getPlan } from "@/features/plans/services/plans.service";
 import { getProject } from "@/features/projects/services/projects.service";
 
 export function ProjectContextPanel({ projectId }: { projectId: string }) {
-  const draft = useMemo(() => loadDraft(projectId), [projectId]);
-
   const { data: project } = useQuery({
     queryKey: ["project", projectId],
     queryFn: () => getProject(projectId),
+  });
+
+  const { data: detail } = useQuery({
+    queryKey: ["project-detail", projectId],
+    queryFn: () => getProjectApi(projectId),
   });
 
   const { data: plan } = useQuery({
@@ -20,6 +23,7 @@ export function ProjectContextPanel({ projectId }: { projectId: string }) {
     queryFn: () => getPlan(projectId),
   });
 
+  const draft = (detail?.land_details ?? {}) as Partial<OnboardingValues>;
   const activeGoal =
     plan?.goals.find((goal) => goal.status === "doing") ?? plan?.goals[0];
 
@@ -28,7 +32,9 @@ export function ProjectContextPanel({ projectId }: { projectId: string }) {
     plan?.recommendations[0]?.crop ||
     "Not set yet";
 
-  const weather = [draft.season, project?.location].filter(Boolean).join(" · ") || "Not set yet";
+  const weather =
+    [draft.season, project?.location].filter(Boolean).join(" · ") ||
+    "Not set yet";
 
   const landConditions =
     draft.soilType && draft.drainage
@@ -39,7 +45,7 @@ export function ProjectContextPanel({ projectId }: { projectId: string }) {
 
   const timeline = activeGoal
     ? `${activeGoal.title} (${activeGoal.timing})`
-    : plan?.recommendations[0]?.timeline ?? "Not set yet";
+    : (plan?.recommendations[0]?.timeline ?? "Not set yet");
 
   const items = [
     { label: "Crop type", value: cropType, icon: Leaf },

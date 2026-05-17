@@ -21,7 +21,15 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
   });
 
   useEffect(() => {
-    setReadiness(Math.round(countSubtasks(loadProgressGoals(projectId)).percent));
+    let cancelled = false;
+    loadProgressGoals(projectId).then((goals) => {
+      if (!cancelled) {
+        setReadiness(Math.round(countSubtasks(goals).percent));
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [projectId]);
 
   if (isLoading) {

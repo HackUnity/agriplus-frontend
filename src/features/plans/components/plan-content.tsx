@@ -14,8 +14,26 @@ export function PlanContent({ projectId }: { projectId: string }) {
     queryFn: () => getPlan(projectId),
   });
 
-  if (isLoading || !plan) {
+  if (isLoading) {
     return <p className="text-muted-foreground">Loading farming plan...</p>;
+  }
+
+  if (!plan?.phases?.length) {
+    return (
+      <div className="space-y-4">
+        <PageHeader
+          title="AI farming plan"
+          description="No plan has been generated for this project yet."
+        />
+        <p className="text-muted-foreground">
+          Complete onboarding with a land photo to generate your personalized
+          cultivation plan.
+        </p>
+        <Button asChild>
+          <Link href={`/projects/${projectId}/onboarding`}>Continue onboarding</Link>
+        </Button>
+      </div>
+    );
   }
 
   return (

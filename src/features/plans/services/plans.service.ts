@@ -1,9 +1,21 @@
-import { demoPlan } from "@/lib/demo-data";
 import { loadPipelineResult } from "@/features/plans/services/pipeline-storage.service";
 import type { FarmingPlan } from "@/types/app.types";
 
+const emptyPlan = (projectId: string): FarmingPlan => ({
+  id: `plan-${projectId}`,
+  projectId,
+  suitabilityScore: 0,
+  summary: "",
+  assumptions: [],
+  recommendations: [],
+  risks: [],
+  goals: [],
+  phases: [],
+  faqs: [],
+});
+
 export async function getPlan(projectId: string): Promise<FarmingPlan> {
-  const pipeline = loadPipelineResult(projectId);
+  const pipeline = await loadPipelineResult(projectId);
 
   if (pipeline?.plan?.phases?.length) {
     const crop = pipeline.plan.crop ?? "your crop";
@@ -28,8 +40,5 @@ export async function getPlan(projectId: string): Promise<FarmingPlan> {
     };
   }
 
-  return {
-    ...demoPlan,
-    projectId,
-  };
+  return emptyPlan(projectId);
 }

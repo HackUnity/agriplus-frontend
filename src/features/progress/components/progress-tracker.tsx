@@ -20,13 +20,21 @@ export function ProgressTracker({ projectId }: { projectId: string }) {
   const { total, completed, percent } = countSubtasks(goals);
 
   useEffect(() => {
-    setGoals(loadProgressGoals(projectId));
+    let cancelled = false;
+    loadProgressGoals(projectId).then((loaded) => {
+      if (!cancelled) {
+        setGoals(loaded);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [projectId]);
 
   function handleSubtaskChange(goalId: string, subtaskId: string) {
     setGoals((current) => {
       const updated = updateSubtaskStatus(current, goalId, subtaskId);
-      saveProgressGoals(projectId, updated);
+      void saveProgressGoals(projectId, updated);
       return updated;
     });
   }
@@ -53,15 +61,21 @@ export function ProgressTracker({ projectId }: { projectId: string }) {
         </CardContent>
       </Card>
 
-      <div className="space-y-4">
-        {goals.map((goal) => (
-          <GoalCard
-            key={goal.id}
-            goal={goal}
-            onSubtaskStatusChange={handleSubtaskChange}
-          />
-        ))}
-      </div>
+      {goals.length > 0 ? (
+        <div className="space-y-4">
+          {goals.map((goal) => (
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              onSubtaskStatusChange={handleSubtaskChange}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-muted-foreground">
+          Generate your farming plan from onboarding to see cultivation steps here.
+        </p>
+      )}
     </div>
   );
 }

@@ -54,7 +54,7 @@ export function DashboardContent() {
       ) : isError ? (
         <EmptyState
           title="We could not load your projects"
-          description="Check your connection and try again. Your saved projects will appear here once Supabase is connected."
+          description="Check that you are logged in and the backend API is running on port 5000."
         />
       ) : projects?.length ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

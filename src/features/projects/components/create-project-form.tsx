@@ -17,6 +17,7 @@ import {
   createProjectSchema,
   type CreateProjectValues,
 } from "@/features/projects/schemas/create-project.schema";
+import { createProject } from "@/features/projects/services/projects.service";
 
 const selectClassName =
   "h-11 w-full rounded-md border bg-background px-3 text-sm";
@@ -33,10 +34,20 @@ export function CreateProjectForm() {
   });
 
   async function onSubmit(values: CreateProjectValues) {
-    toast.success(`${values.name} created`, {
-      description: "Next, answer a few land questions so AI can build a plan.",
-    });
-    router.push("/projects/demo-project/onboarding");
+    try {
+      const project = await createProject(values);
+      toast.success(`${values.name} created`, {
+        description: "Next, answer a few land questions so AI can build a plan.",
+      });
+      router.push(`/projects/${project.id}/onboarding`);
+    } catch (error) {
+      toast.error("Could not create project", {
+        description:
+          error instanceof Error
+            ? error.message
+            : "Check that you are logged in and the backend is running.",
+      });
+    }
   }
 
   return (

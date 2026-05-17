@@ -1,43 +1,35 @@
+import { getProjectApi, savePipelineResultApi } from "@/lib/api/projects";
 import { saveProgressGoals } from "@/features/progress/services/progress.service";
 import type { FarmingGoal, PlanPhase } from "@/types/app.types";
 import type { FarmLayout, PipelineRunResponse } from "@/types/pipeline.types";
 
-const pipelineKey = (projectId: string) => `agripilot:pipeline:${projectId}`;
-
-export function savePipelineResult(projectId: string, result: PipelineRunResponse) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.localStorage.setItem(pipelineKey(projectId), JSON.stringify(result));
+export async function savePipelineResult(
+  projectId: string,
+  result: PipelineRunResponse,
+) {
+  await savePipelineResultApi(projectId, result);
 
   const phases = result.plan?.phases;
   if (phases?.length) {
-    saveProgressGoals(projectId, phasesToGoals(phases));
+    await saveProgressGoals(projectId, phasesToGoals(phases));
   }
 }
 
-export function loadPipelineResult(
+export async function loadPipelineResult(
   projectId: string,
-): PipelineRunResponse | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  const raw = window.localStorage.getItem(pipelineKey(projectId));
-  if (!raw) {
-    return null;
-  }
-
+): Promise<PipelineRunResponse | null> {
   try {
-    return JSON.parse(raw) as PipelineRunResponse;
+    const project = await getProjectApi(projectId);
+    return project.pipeline_result ?? null;
   } catch {
     return null;
   }
 }
 
-export function loadPipelineLayout(projectId: string): FarmLayout | null {
-  const result = loadPipelineResult(projectId);
+export async function loadPipelineLayout(
+  projectId: string,
+): Promise<FarmLayout | null> {
+  const result = await loadPipelineResult(projectId);
   if (!result?.layout) {
     return null;
   }

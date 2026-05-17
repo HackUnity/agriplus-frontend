@@ -96,7 +96,7 @@ export function TroubleshootingChat({
     setImage(undefined);
     setLoading(true);
 
-    const cultivationPlan = buildCultivationPlanForExpert(projectId);
+    const cultivationPlan = await buildCultivationPlanForExpert(projectId);
     let assistantContent: string;
 
     if (!cultivationPlan) {
