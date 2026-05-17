@@ -31,7 +31,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
     res = await fetch(`${apiBaseUrl}${path}`, { ...init, headers });
   } catch {
     throw new Error(
-      "Cannot reach the backend. Start the API on port 5000 and check NEXT_PUBLIC_API_URL.",
+      "Cannot reach the backend. Make sure the API is running and that NEXT_PUBLIC_API_URL points to it.",
     );
   }
 

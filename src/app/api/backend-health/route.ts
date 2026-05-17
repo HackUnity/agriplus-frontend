@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-
-const backendBase =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:5000";
+import { apiBaseUrl } from "@/lib/env";
 
 /** Proxies backend health so the browser never needs a cross-origin call. */
 export async function GET() {
   try {
-    const res = await fetch(`${backendBase}/api/health`, {
+    const res = await fetch(`${apiBaseUrl}/api/health`, {
       cache: "no-store",
     });
     const body = await res.json().catch(() => ({}));
@@ -15,7 +13,7 @@ export async function GET() {
     return NextResponse.json(
       {
         status: "error",
-        detail: `Cannot reach the API at ${backendBase}. Start the backend (port 5000).`,
+        detail: `Cannot reach the API at ${apiBaseUrl}. Check NEXT_PUBLIC_API_URL.`,
       },
       { status: 503 },
     );

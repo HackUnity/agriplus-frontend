@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-
-const backendBase =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:5000";
+import { apiBaseUrl } from "@/lib/env";
 
 const requestSchema = z.object({
   cultivation_plan: z.record(z.string(), z.unknown()),
@@ -27,7 +25,7 @@ export async function POST(request: Request) {
   const { cultivation_plan, question, targetedStepDescription } = parsed.data;
 
   try {
-    const backendRes = await fetch(`${backendBase}/api/pipeline/ask-expert`, {
+    const backendRes = await fetch(`${apiBaseUrl}/api/pipeline/ask-expert`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -59,7 +57,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error: "Backend unreachable",
-        detail: `${detail} Ensure the API is running at ${backendBase}.`,
+        detail: `${detail} Ensure the API is running at ${apiBaseUrl}.`,
       },
       { status: 503 },
     );

@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-
-const backendBase =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:5000";
+import { apiBaseUrl } from "@/lib/env";
 
 /** Allow long-running vision → plan → layout pipeline (local dev + Vercel). */
 export const maxDuration = 300;
@@ -39,7 +37,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const backendRes = await fetch(`${backendBase}/api/pipeline/run`, {
+    const backendRes = await fetch(`${apiBaseUrl}/api/pipeline/run`, {
       method: "POST",
       body: formData,
       cache: "no-store",
@@ -66,7 +64,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error: "Backend unreachable",
-        detail: `${detail} Ensure the API is running at ${backendBase}.`,
+        detail: `${detail} Ensure the API is running at ${apiBaseUrl}.`,
       },
       { status: 503 },
     );
