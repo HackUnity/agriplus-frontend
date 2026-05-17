@@ -6,7 +6,10 @@ export function Skeleton({
 }: React.ComponentProps<"div">) {
   return (
     <div
-      className={cn("animate-pulse rounded-md bg-muted", className)}
+      className={cn(
+        "animate-pulse rounded-md bg-muted/80",
+        className,
+      )}
       {...props}
     />
   );

@@ -25,19 +25,23 @@ export function GoalCard({ goal, onSubtaskStatusChange }: GoalCardProps) {
     : 0;
 
   return (
-    <Card>
+    <Card className="shadow-xs">
       <CardContent className="space-y-5 p-5">
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-3">
-            <h2 className="text-lg font-semibold">{goal.title}</h2>
+            <h2 className="text-lg font-semibold text-foreground">
+              {goal.title}
+            </h2>
             <StepStatusBadge status={goal.status} />
           </div>
           <p className="text-sm font-semibold text-primary">{goal.timing}</p>
-          <p className="text-sm leading-6 text-muted-foreground">{goal.description}</p>
+          <p className="text-sm leading-6 text-muted-foreground">
+            {goal.description}
+          </p>
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>Sub-tasks</span>
-              <span>
+              <span className="font-medium text-foreground">
                 {completed} of {goal.subtasks.length} done
               </span>
             </div>
@@ -49,14 +53,14 @@ export function GoalCard({ goal, onSubtaskStatusChange }: GoalCardProps) {
           {goal.subtasks.map((subtask) => (
             <li
               key={subtask.id}
-              className="flex flex-col gap-3 rounded-lg border bg-muted/40 p-3 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 rounded-lg border border-border bg-muted/40 p-3 transition-colors hover:bg-muted/70 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex flex-wrap items-center gap-3">
                 <span
                   className={
                     subtask.status === "done"
                       ? "text-sm text-muted-foreground line-through"
-                      : "text-sm font-medium"
+                      : "text-sm font-medium text-foreground"
                   }
                 >
                   {subtask.title}

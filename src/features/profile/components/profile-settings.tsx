@@ -42,7 +42,7 @@ export function ProfileSettings() {
               <select
                 id="experience"
                 defaultValue="beginner"
-                className="h-11 w-full rounded-md border bg-background px-3 text-sm"
+                className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm shadow-xs transition-colors hover:border-border-strong focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25"
               >
                 <option value="beginner">Beginner</option>
                 <option value="some">Some farming experience</option>

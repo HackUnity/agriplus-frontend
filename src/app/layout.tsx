@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgriPlus",
+  title: "AgriPilot — AI farming planner",
   description: "AI-powered cultivation planning for beginner farmers.",
 };
 

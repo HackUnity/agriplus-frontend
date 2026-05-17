@@ -112,7 +112,10 @@ export function AuthCard({ mode }: { mode: "login" | "signup" | "forgot" }) {
             onSubmit={handleSubmit(onSubmit)}
           >
             {formError ? (
-              <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+              <div
+                className="flex items-start gap-3 rounded-lg border border-destructive/40 bg-destructive-soft px-4 py-3 text-sm text-destructive shadow-xs"
+                role="alert"
+              >
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 <p>{formError}</p>
               </div>

@@ -137,8 +137,9 @@ export function ChatPromptComposer({
 
         <div
           className={cn(
-            "flex items-end gap-1 rounded-xl border bg-background p-2 shadow-sm",
-            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+            "flex items-end gap-1 rounded-xl border border-input bg-card p-2 shadow-xs transition-colors",
+            "hover:border-border-strong",
+            "focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/25",
           )}
         >
           <input

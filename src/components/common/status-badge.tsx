@@ -12,11 +12,13 @@ const projectLabels: Record<ProjectStatus, string> = {
 
 export function ProjectStatusBadge({ status }: { status: ProjectStatus }) {
   const variant =
-    status === "ready" || status === "in_progress" || status === "completed"
+    status === "completed"
       ? "success"
-      : status === "generating"
-        ? "warning"
-        : "secondary";
+      : status === "ready" || status === "in_progress"
+        ? "accent"
+        : status === "generating"
+          ? "warning"
+          : "secondary";
 
   return <Badge variant={variant}>{projectLabels[status]}</Badge>;
 }
@@ -30,7 +32,13 @@ export function StepStatusBadge({ status }: { status: StepStatus }) {
   };
 
   const variant =
-    status === "done" ? "success" : status === "blocked" ? "warning" : "secondary";
+    status === "done"
+      ? "success"
+      : status === "doing"
+        ? "accent"
+        : status === "blocked"
+          ? "warning"
+          : "secondary";
 
   return <Badge variant={variant}>{labels[status]}</Badge>;
 }

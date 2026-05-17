@@ -178,8 +178,8 @@ export function BuyerDashboard() {
       )}
 
       <section>
-        <h2 className="mb-4 flex items-center gap-2 font-serif text-xl font-semibold text-[#1B4332]">
-          <Gavel className="h-5 w-5 text-[#F59E0B]" />
+        <h2 className="mb-4 flex items-center gap-2 font-serif text-xl font-semibold text-primary-strong">
+          <Gavel className="h-5 w-5 text-warning" />
           My active bids
         </h2>
         <p className="mb-4 text-sm text-muted-foreground">
@@ -192,7 +192,10 @@ export function BuyerDashboard() {
           <Card className="border-dashed">
             <CardContent className="py-8 text-center text-sm text-muted-foreground">
               No active bids.{" "}
-              <Link href="/#marketplace" className="text-[#1B4332] underline">
+              <Link
+                href="/#marketplace"
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
                 Browse the marketplace
               </Link>
             </CardContent>
@@ -200,16 +203,14 @@ export function BuyerDashboard() {
         ) : (
           <div className="space-y-3">
             {myBids.map((b) => (
-              <Card key={b.id} className="border-[#d9e2d2]">
+              <Card key={b.id} className="shadow-sm transition-shadow hover:shadow-md">
                 <CardContent className="flex flex-wrap items-start justify-between gap-4 p-4">
-                  <div className="min-w-0 flex-1 space-y-1">
+                  <div className="min-w-0 flex-1 space-y-1.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold text-[#1B4332]">{b.listing.title}</p>
-                      {b.isLeading && (
-                        <Badge className="bg-emerald-100 text-emerald-800">
-                          Leading
-                        </Badge>
-                      )}
+                      <p className="font-semibold text-foreground">
+                        {b.listing.title}
+                      </p>
+                      {b.isLeading && <Badge variant="success">Leading</Badge>}
                     </div>
                     <p className="text-sm text-muted-foreground">
                       Your bid: LKR {b.amount.toLocaleString()} · {b.listing.district}
@@ -221,7 +222,7 @@ export function BuyerDashboard() {
                     <BidCountdown endsAt={b.listing.bidEndsAt} />
                     <Link
                       href={`/marketplace/${b.listing.id}`}
-                      className="text-xs text-[#1B4332] underline"
+                      className="text-xs font-medium text-primary underline-offset-4 hover:underline"
                     >
                       View listing
                     </Link>
@@ -247,8 +248,8 @@ export function BuyerDashboard() {
       </section>
 
       <section>
-        <h2 className="mb-4 flex items-center gap-2 font-serif text-xl font-semibold text-[#1B4332]">
-          <Trophy className="h-5 w-5 text-[#F59E0B]" />
+        <h2 className="mb-4 flex items-center gap-2 font-serif text-xl font-semibold text-primary-strong">
+          <Trophy className="h-5 w-5 text-warning" />
           Won auctions — claim & pay
         </h2>
         <p className="mb-4 text-sm text-muted-foreground">
@@ -287,7 +288,6 @@ export function BuyerDashboard() {
                   {o.status === "BID_WON" && (
                     <Button
                       size="sm"
-                      className="bg-[#1B4332]"
                       onClick={() => void confirmPurchase(o.id)}
                     >
                       Claim & confirm purchase
@@ -297,7 +297,6 @@ export function BuyerDashboard() {
                     <div className="flex flex-wrap gap-2">
                       <Button
                         size="sm"
-                        className="bg-[#1B4332]"
                         disabled={payingOrderId === o.id}
                         onClick={() => void startPayhere(o.id)}
                       >
@@ -316,7 +315,7 @@ export function BuyerDashboard() {
                     </div>
                   )}
                   {o.status === "PAYMENT_CONFIRMED" && (
-                    <p className="text-emerald-700">
+                    <p className="font-medium text-success">
                       Downpayment received — awaiting farmer dispatch.
                     </p>
                   )}

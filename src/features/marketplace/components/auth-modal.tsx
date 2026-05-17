@@ -69,33 +69,41 @@ export function AuthModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center">
-      <div className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/60 p-4 backdrop-blur-sm sm:items-center">
+      <div className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-xl">
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-1 hover:bg-muted"
+          className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           aria-label="Close"
         >
           <X className="h-5 w-5" />
         </button>
-        <h2 className="font-serif text-2xl font-bold text-[#1B4332]">
+        <h2 className="font-serif text-2xl font-bold tracking-tight text-primary-strong">
           {tab === "register" ? "Join AgriMarket" : "Sign in to bid"}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Buy fresh produce directly from Sri Lankan farmers.
         </p>
-        <div className="mt-4 flex gap-2 rounded-lg bg-[#edf2e8] p-1">
+        <div className="mt-5 flex gap-1 rounded-lg bg-accent p-1">
           <button
             type="button"
-            className={`flex-1 rounded-md py-2 text-sm font-medium ${tab === "register" ? "bg-white shadow" : ""}`}
+            className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
+              tab === "register"
+                ? "bg-card text-primary-strong shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
             onClick={() => setTab("register")}
           >
             Register
           </button>
           <button
             type="button"
-            className={`flex-1 rounded-md py-2 text-sm font-medium ${tab === "login" ? "bg-white shadow" : ""}`}
+            className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
+              tab === "login"
+                ? "bg-card text-primary-strong shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
             onClick={() => setTab("login")}
           >
             Login
@@ -144,11 +152,11 @@ export function AuthModal({
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 />
               </div>
-              <div>
+              <div className="space-y-1.5">
                 <Label htmlFor="district">Your district</Label>
                 <select
                   id="district"
-                  className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                  className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm shadow-xs"
                   value={form.district}
                   onChange={(e) =>
                     setForm({ ...form, district: e.target.value })
@@ -171,11 +179,7 @@ export function AuthModal({
               </div>
             </>
           )}
-          <Button
-            type="submit"
-            className="w-full bg-[#1B4332] hover:bg-[#2d6a4f]"
-            disabled={loading}
-          >
+          <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Please wait…" : tab === "register" ? "Create account" : "Sign in"}
           </Button>
         </form>

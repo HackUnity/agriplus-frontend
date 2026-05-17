@@ -70,16 +70,16 @@ export function PipelineLoadingOverlay({ cropName }: PipelineLoadingOverlayProps
       aria-labelledby="pipeline-loading-title"
       aria-describedby="pipeline-loading-desc"
     >
-      <div className="w-full max-w-md rounded-2xl border bg-card p-8 shadow-xl">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-xl">
         <div className="flex flex-col items-center text-center">
-          <div className="relative mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+          <div className="relative mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent shadow-sm">
             <Sprout className="h-8 w-8 text-primary" aria-hidden />
             <Loader2
               className="absolute -right-1 -top-1 h-6 w-6 animate-spin text-primary"
               aria-hidden
             />
           </div>
-          <h2 id="pipeline-loading-title" className="text-xl font-bold">
+          <h2 id="pipeline-loading-title" className="text-xl font-bold text-foreground">
             Creating your farming plan
           </h2>
           <p

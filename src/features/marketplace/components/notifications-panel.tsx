@@ -58,8 +58,8 @@ export function NotificationsPanel() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Bell className="h-6 w-6 text-[#F59E0B]" />
-          <span className="font-serif text-lg font-semibold text-[#1B4332]">
+          <Bell className="h-6 w-6 text-warning" />
+          <span className="font-serif text-lg font-semibold text-primary-strong">
             {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
           </span>
         </div>
@@ -85,27 +85,27 @@ export function NotificationsPanel() {
               <Card
                 className={cn(
                   "transition-colors",
-                  n.read ? "border-[#d9e2d2]" : "border-amber-300 bg-amber-50/80",
+                  n.read
+                    ? "border-border"
+                    : "border-warning/40 bg-warning-soft/60 shadow-sm",
                 )}
               >
                 <CardContent className="flex flex-wrap items-start justify-between gap-3 p-4">
-                  <div className="min-w-0 flex-1 space-y-1">
+                  <div className="min-w-0 flex-1 space-y-1.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold text-[#1B4332]">{n.title}</p>
-                      {!n.read && (
-                        <Badge variant="secondary" className="bg-[#F59E0B]/20 text-[#1B4332]">
-                          New
-                        </Badge>
-                      )}
+                      <p className="font-semibold text-foreground">{n.title}</p>
+                      {!n.read && <Badge variant="warning">New</Badge>}
                     </div>
-                    <p className="text-sm text-muted-foreground">{n.message}</p>
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      {n.message}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(n.createdAt).toLocaleString()}
                     </p>
                     {n.listingId && (
                       <Link
                         href={`/marketplace/${n.listingId}`}
-                        className="text-xs text-[#1B4332] underline"
+                        className="text-xs font-medium text-primary underline-offset-4 hover:underline"
                       >
                         View listing
                       </Link>

@@ -49,13 +49,15 @@ export function PlanContent({ projectId }: { projectId: string }) {
       />
 
       {plan.faqs && plan.faqs.length > 0 ? (
-        <section className="space-y-3 rounded-lg border bg-muted/30 p-5">
-          <h2 className="text-lg font-semibold">Crop FAQs</h2>
+        <section className="space-y-4 rounded-xl border border-border bg-mint-gradient p-6 shadow-xs">
+          <h2 className="text-lg font-semibold text-primary-strong">Crop FAQs</h2>
           <ul className="space-y-4">
             {plan.faqs.map((faq) => (
               <li key={faq.question} className="space-y-1">
-                <p className="font-medium">{faq.question}</p>
-                <p className="text-sm leading-6 text-muted-foreground">{faq.answer}</p>
+                <p className="font-medium text-foreground">{faq.question}</p>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {faq.answer}
+                </p>
               </li>
             ))}
           </ul>

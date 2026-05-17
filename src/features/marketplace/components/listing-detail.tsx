@@ -87,7 +87,10 @@ export function ListingDetail({ listingId }: { listingId: string }) {
     return (
       <p className="p-8 text-center">
         Listing not found.{" "}
-        <Link href="/#marketplace" className="text-[#1B4332] underline">
+        <Link
+          href="/#marketplace"
+          className="font-medium text-primary underline-offset-4 hover:underline"
+        >
           Back to marketplace
         </Link>
       </p>
@@ -143,31 +146,35 @@ export function ListingDetail({ listingId }: { listingId: string }) {
 
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
-          <div className="overflow-hidden rounded-2xl bg-[#edf2e8]">
+          <div className="overflow-hidden rounded-2xl border border-border bg-accent shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={image} alt={listing.title} className="aspect-square w-full object-cover" />
           </div>
           {listing.images.length > 1 && (
-            <div className="mt-2 flex gap-2 overflow-x-auto">
+            <div className="mt-3 flex gap-2 overflow-x-auto">
               {listing.images.map((src) => (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   key={src}
                   src={src}
                   alt=""
-                  className="h-16 w-16 rounded-lg object-cover"
+                  className="h-16 w-16 rounded-lg border border-border object-cover"
                 />
               ))}
             </div>
           )}
-          <p className="mt-6 text-muted-foreground">{listing.description}</p>
+          <p className="mt-6 leading-7 text-muted-foreground">
+            {listing.description}
+          </p>
         </div>
 
         <div className="space-y-6">
           {auctionClosed && (
-            <Card className="border-amber-300 bg-amber-50">
+            <Card className="border-warning/40 bg-warning-soft">
               <CardContent className="p-4 text-sm">
-                <p className="font-semibold text-[#1B4332]">Auction ended</p>
+                <p className="font-semibold text-warning-foreground">
+                  Auction ended
+                </p>
                 <p className="mt-1 text-muted-foreground">
                   This listing is no longer on the marketplace.
                   {listing.status === "SOLD" && winnerName
@@ -179,7 +186,7 @@ export function ListingDetail({ listingId }: { listingId: string }) {
                 {user && (
                   <Link
                     href="/marketplace-orders"
-                    className="mt-2 inline-block text-[#1B4332] underline"
+                    className="mt-2 inline-block font-medium text-primary underline-offset-4 hover:underline"
                   >
                     Check My bids & orders
                   </Link>
@@ -189,7 +196,7 @@ export function ListingDetail({ listingId }: { listingId: string }) {
           )}
           <div>
             <BidCountdown endsAt={listing.bidEndsAt} />
-            <h1 className="mt-3 font-serif text-3xl font-bold text-[#1B4332]">
+            <h1 className="mt-3 font-serif text-3xl font-bold tracking-tight text-primary-strong">
               {listing.title}
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -197,44 +204,44 @@ export function ListingDetail({ listingId }: { listingId: string }) {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4" />
             {listing.farmer.name} · {listing.district}
           </div>
 
-          <Card>
-            <CardContent className="grid grid-cols-2 gap-4 p-4 text-sm">
+          <Card className="shadow-sm">
+            <CardContent className="grid grid-cols-2 gap-4 p-5 text-sm">
               <div>
                 <p className="text-muted-foreground">Current bid</p>
-                <p className="text-xl font-bold text-[#1B4332]">
+                <p className="text-xl font-bold text-primary-strong">
                   LKR {(listing.currentBid ?? listing.startPrice).toLocaleString()}
                 </p>
               </div>
               <div>
                 <p className="text-muted-foreground">Floor / unit</p>
-                <p className="font-medium">
+                <p className="font-medium text-foreground">
                   LKR {listing.floorPricePerUnit.toLocaleString()}
                 </p>
               </div>
               <div>
                 <p className="text-muted-foreground">Quantity</p>
-                <p className="font-medium">
+                <p className="font-medium text-foreground">
                   {listing.quantity} {listing.unit}
                 </p>
               </div>
               <div>
                 <p className="text-muted-foreground">Bids</p>
-                <p className="font-medium">{listing.bidCount}</p>
+                <p className="font-medium text-foreground">{listing.bidCount}</p>
               </div>
             </CardContent>
           </Card>
 
           {user && distanceKm != null && (
-            <Card className="border-amber-200 bg-amber-50/50">
+            <Card className="border-warning/30 bg-warning-soft/60">
               <CardContent className="flex gap-3 p-4 text-sm">
-                <Truck className="h-5 w-5 shrink-0 text-[#F59E0B]" />
+                <Truck className="h-5 w-5 shrink-0 text-warning" />
                 <div>
-                  <p className="font-medium text-[#1B4332]">
+                  <p className="font-medium text-foreground">
                     ~{distanceKm} km from {user.district} to {listing.district}
                   </p>
                   <p className="text-muted-foreground">
@@ -246,7 +253,7 @@ export function ListingDetail({ listingId }: { listingId: string }) {
           )}
 
           {isOwnListing && (
-            <p className="text-sm text-amber-800">
+            <p className="text-sm text-warning-foreground">
               You cannot bid on your own listing. Other farmers and buyers can bid.
             </p>
           )}
@@ -262,7 +269,6 @@ export function ListingDetail({ listingId }: { listingId: string }) {
                 onChange={(e) => setBidAmount(e.target.value)}
               />
               <Button
-                className="bg-[#1B4332] hover:bg-[#2d6a4f]"
                 onClick={openBidFlow}
                 disabled={auctionClosed || listing.status !== "ACTIVE" || isOwnListing}
               >
@@ -304,30 +310,29 @@ export function ListingDetail({ listingId }: { listingId: string }) {
       </div>
 
       {confirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="max-w-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 p-4 backdrop-blur-sm">
+          <Card className="w-full max-w-md shadow-xl">
             <CardHeader>
               <CardTitle>Confirm your bid</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
               <p>
-                You are bidding <strong>LKR {Number(bidAmount).toLocaleString()}</strong> for{" "}
-                {listing.quantity} {listing.unit} of {listing.title} from {listing.district}.
+                You are bidding{" "}
+                <strong className="text-foreground">
+                  LKR {Number(bidAmount).toLocaleString()}
+                </strong>{" "}
+                for {listing.quantity} {listing.unit} of {listing.title} from{" "}
+                {listing.district}.
               </p>
               <p>Estimated transport: LKR {transportCost.toLocaleString()}</p>
               <p className="font-semibold">
                 Total estimated cost: LKR {totalEstimate.toLocaleString()}
               </p>
-              <div className="flex gap-2">
+              <div className="flex justify-end gap-2 pt-2">
                 <Button variant="outline" onClick={() => setConfirmOpen(false)}>
                   Cancel
                 </Button>
-                <Button
-                  className="bg-[#1B4332]"
-                  onClick={() => void placeBid()}
-                >
-                  Confirm bid
-                </Button>
+                <Button onClick={() => void placeBid()}>Confirm bid</Button>
               </div>
             </CardContent>
           </Card>

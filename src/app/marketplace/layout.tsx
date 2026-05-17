@@ -19,7 +19,7 @@ export default function MarketplaceLayout({
 }) {
   return (
     <div
-      className={`${playfair.variable} ${dmSans.variable} min-h-screen bg-[#faf8f3] font-[family-name:var(--font-dm-sans)]`}
+      className={`${playfair.variable} ${dmSans.variable} min-h-screen bg-background font-[family-name:var(--font-dm-sans)]`}
     >
       <MarketplaceAuthProvider>
         <MarketplaceSiteHeader embedded />

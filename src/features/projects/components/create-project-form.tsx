@@ -20,7 +20,7 @@ import {
 import { createProject } from "@/features/projects/services/projects.service";
 
 const selectClassName =
-  "h-11 w-full rounded-md border bg-background px-3 text-sm";
+  "h-11 w-full rounded-md border border-input bg-card px-3 text-sm shadow-xs transition-colors hover:border-border-strong focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25";
 
 export function CreateProjectForm() {
   const router = useRouter();

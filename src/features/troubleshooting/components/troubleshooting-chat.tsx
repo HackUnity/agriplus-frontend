@@ -153,14 +153,16 @@ export function TroubleshootingChat({
                       )}
                     >
                       {assistant ? (
-                        <Bot className="mt-2 h-5 w-5 shrink-0 text-primary" />
+                        <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-primary">
+                          <Bot className="h-4 w-4" />
+                        </div>
                       ) : null}
                       <div
                         className={cn(
-                          "max-w-[85%] space-y-2 rounded-xl px-4 py-3 text-sm leading-6",
+                          "max-w-[85%] space-y-2 rounded-2xl px-4 py-3 text-sm leading-6 shadow-xs",
                           assistant
-                            ? "bg-muted text-foreground"
-                            : "bg-primary text-primary-foreground",
+                            ? "rounded-tl-md border border-border bg-card text-foreground"
+                            : "rounded-tr-md bg-primary text-primary-foreground",
                         )}
                       >
                         {message.image ? (
@@ -176,7 +178,9 @@ export function TroubleshootingChat({
                         <p className="whitespace-pre-wrap">{message.content}</p>
                       </div>
                       {!assistant ? (
-                        <User className="mt-2 h-5 w-5 shrink-0 text-primary" />
+                        <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-strong text-primary-foreground">
+                          <User className="h-4 w-4" />
+                        </div>
                       ) : null}
                     </div>
                   );
@@ -206,11 +210,12 @@ export function TroubleshootingChat({
                         key={item}
                         type="button"
                         onClick={() => selectCategory(item)}
+                        aria-pressed={active}
                         className={cn(
                           "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
                           active
-                              ? "border-primary bg-primary text-primary-foreground"
-                              : "border-border bg-background text-foreground hover:bg-muted",
+                            ? "border-primary bg-primary text-primary-foreground shadow-xs"
+                            : "border-border bg-card text-muted-foreground hover:border-border-strong hover:bg-muted hover:text-foreground",
                         )}
                       >
                         {item}

@@ -23,15 +23,17 @@ export function FarmerRoleGuard({ children }: { children: React.ReactNode }) {
 
   if (user && !isFarmer) {
     return (
-      <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-6 text-sm">
-        <p className="font-medium text-[#1B4332]">Farmer tools only</p>
-        <p className="mt-2 text-muted-foreground">
+      <div className="rounded-lg border border-warning/40 bg-warning-soft/60 p-6 text-sm shadow-sm">
+        <p className="font-semibold text-warning-foreground">
+          Farmer tools only
+        </p>
+        <p className="mt-2 leading-6 text-muted-foreground">
           Buyer accounts can bid on listings and complete purchases after winning.
           To list produce, register or sign in as a farmer on the marketplace.
         </p>
         <Link
           href="/marketplace-orders"
-          className="mt-4 inline-block text-[#1B4332] underline"
+          className="mt-4 inline-block font-medium text-primary underline-offset-4 hover:underline"
         >
           View your orders
         </Link>

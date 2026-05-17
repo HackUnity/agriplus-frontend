@@ -41,7 +41,9 @@ function FarmerOrdersSection() {
 
   return (
     <section className="mt-10 space-y-4">
-      <h2 className="font-serif text-xl font-semibold text-[#1B4332]">Your sales</h2>
+      <h2 className="font-serif text-xl font-semibold text-primary-strong">
+        Your sales
+      </h2>
       {farmerSales.length === 0 ? (
         <p className="text-sm text-muted-foreground">No sales yet.</p>
       ) : (

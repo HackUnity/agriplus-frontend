@@ -56,7 +56,7 @@ export function MarketplaceSiteHeader({ embedded = false }: MarketplaceSiteHeade
         : "AgriPilot";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#d9e2d2]/80 bg-[#faf8f3]/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-2 sm:gap-4">
           {embedded && loggedIn && (
@@ -67,11 +67,14 @@ export function MarketplaceSiteHeader({ embedded = false }: MarketplaceSiteHeade
               </Link>
             </Button>
           )}
-          <Link href={homeHref} className="flex min-w-0 items-center gap-2">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#1B4332] text-white">
+          <Link
+            href={homeHref}
+            className="flex min-w-0 items-center gap-2 rounded-lg p-1 -m-1 transition-colors hover:bg-muted/60"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-gradient text-primary-foreground shadow-sm">
               <Leaf className="h-5 w-5" />
             </div>
-            <span className="truncate font-serif text-lg font-bold text-[#1B4332]">
+            <span className="truncate font-serif text-lg font-bold text-primary-strong">
               {logoLabel}
             </span>
           </Link>
@@ -113,11 +116,7 @@ export function MarketplaceSiteHeader({ embedded = false }: MarketplaceSiteHeade
                   <Link href="/notifications">Notifications</Link>
                 </Button>
               )}
-              <Button
-                asChild
-                size="sm"
-                className="bg-[#1B4332] hover:bg-[#2d6a4f]"
-              >
+              <Button asChild size="sm">
                 <Link href={isFarmer ? "/dashboard" : "/marketplace-orders"}>
                   <LayoutDashboard className="mr-1 h-4 w-4 sm:inline" />
                   <span className="max-w-[100px] truncate sm:max-w-none">
@@ -134,11 +133,7 @@ export function MarketplaceSiteHeader({ embedded = false }: MarketplaceSiteHeade
               <Button asChild variant="outline" size="sm">
                 <Link href="/login">Sign in</Link>
               </Button>
-              <Button
-                asChild
-                size="sm"
-                className="hidden bg-[#1B4332] hover:bg-[#2d6a4f] sm:inline-flex"
-              >
+              <Button asChild size="sm" className="hidden sm:inline-flex">
                 <Link href="/signup">Get started</Link>
               </Button>
             </>

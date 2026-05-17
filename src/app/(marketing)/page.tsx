@@ -23,10 +23,10 @@ export default function LandingPage() {
       <section className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
         <div className="flex flex-col justify-center gap-8">
           <div className="space-y-5">
-            <p className="w-fit rounded-full bg-[#edf2e8] px-4 py-2 text-sm font-semibold text-[#1B4332]">
+            <p className="w-fit rounded-full border border-border bg-accent px-4 py-1.5 text-sm font-semibold text-primary-strong">
               AI planning for first-time farmers
             </p>
-            <h2 className="font-serif text-3xl font-bold tracking-tight text-[#1B4332] sm:text-4xl">
+            <h2 className="font-serif text-3xl font-bold tracking-tight text-primary-strong sm:text-4xl">
               Turn your land into a clear farming plan.
             </h2>
             <p className="max-w-2xl text-lg leading-8 text-muted-foreground">
@@ -36,7 +36,7 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg" className="bg-[#1B4332] hover:bg-[#2d6a4f]">
+            <Button asChild size="lg">
               <Link href="/signup">
                 Create your first project <ArrowRight className="h-4 w-4" />
               </Link>
@@ -46,17 +46,25 @@ export default function LandingPage() {
             </Button>
           </div>
         </div>
-        <Card className="border-[#d9e2d2] bg-white/80 shadow-md">
+        <Card className="shadow-md">
           <CardHeader>
-            <CardTitle className="font-serif text-[#1B4332]">
+            <CardTitle className="font-serif text-primary-strong">
               Your beginner-friendly farming workspace
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {steps.map((step) => (
-              <div key={step} className="flex gap-3 rounded-lg bg-[#edf2e8] p-4">
-                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#F59E0B]" />
-                <p className="text-sm font-medium">{step}</p>
+          <CardContent className="space-y-3">
+            {steps.map((step, idx) => (
+              <div
+                key={step}
+                className="flex items-start gap-3 rounded-lg border border-border bg-mint-gradient p-4 transition-colors hover:border-border-strong"
+              >
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-sm">
+                  {idx + 1}
+                </div>
+                <p className="pt-0.5 text-sm font-medium text-foreground">
+                  {step}
+                </p>
+                <CheckCircle2 className="ml-auto mt-0.5 h-5 w-5 shrink-0 text-success" />
               </div>
             ))}
           </CardContent>
@@ -83,11 +91,18 @@ export default function LandingPage() {
         ].map((feature) => {
           const Icon = feature.icon;
           return (
-            <Card key={feature.title} className="border-[#d9e2d2]">
+            <Card
+              key={feature.title}
+              className="transition-shadow hover:shadow-md"
+            >
               <CardContent className="space-y-4 p-6">
-                <Icon className="h-8 w-8 text-[#1B4332]" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-primary">
+                  <Icon className="h-6 w-6" />
+                </div>
                 <div>
-                  <h3 className="font-semibold text-[#1B4332]">{feature.title}</h3>
+                  <h3 className="font-semibold text-primary-strong">
+                    {feature.title}
+                  </h3>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     {feature.text}
                   </p>

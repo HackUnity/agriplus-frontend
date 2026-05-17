@@ -71,24 +71,28 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
           {
             title: "AI farming plan",
             icon: FileText,
+            iconClass: "bg-accent text-primary",
             href: `/projects/${project.id}/plan`,
             text: "Suitability, recommendations, risks, and timeline.",
           },
           {
             title: "Progress tracker",
             icon: ListChecks,
+            iconClass: "bg-success-soft text-success",
             href: `/projects/${project.id}/progress`,
             text: "Goals with sub-tasks and practical instructions.",
           },
           {
             title: "3D farm layout",
             icon: Cuboid,
+            iconClass: "bg-info-soft text-info",
             href: `/projects/${project.id}/visualization`,
             text: "Prototype rows, zones, paths, and water lines.",
           },
           {
             title: "Troubleshooting",
             icon: Bot,
+            iconClass: "bg-warning-soft text-warning-foreground",
             href: `/projects/${project.id}/troubleshooting`,
             text: "Ask project-aware farming questions.",
           },
@@ -96,9 +100,16 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
           const Icon = item.icon;
 
           return (
-            <Card key={item.title} className="flex flex-col">
-              <CardHeader>
-                <Icon className="h-7 w-7 text-primary" />
+            <Card
+              key={item.title}
+              className="flex flex-col transition-shadow hover:shadow-md"
+            >
+              <CardHeader className="space-y-3">
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-lg ${item.iconClass}`}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
                 <CardTitle>{item.title}</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-1 flex-col justify-between gap-4">

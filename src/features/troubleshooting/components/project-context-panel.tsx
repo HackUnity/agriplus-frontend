@@ -55,17 +55,19 @@ export function ProjectContextPanel({ projectId }: { projectId: string }) {
   ];
 
   return (
-    <div className="rounded-lg border bg-muted/30 px-4 py-3">
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+    <div className="rounded-xl border border-border bg-mint-gradient px-4 py-4 shadow-xs">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
         Using project context
       </p>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         {items.map(({ label, value, icon: Icon }) => (
           <div key={label} className="flex gap-2.5 text-sm">
-            <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <div>
+            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-card text-primary shadow-xs">
+              <Icon className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
               <p className="font-medium text-foreground">{label}</p>
-              <p className="text-muted-foreground">{value}</p>
+              <p className="truncate text-muted-foreground">{value}</p>
             </div>
           </div>
         ))}

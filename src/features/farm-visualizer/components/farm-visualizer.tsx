@@ -16,7 +16,7 @@ const FarmScene = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-[460px] items-center justify-center rounded-xl bg-muted text-muted-foreground">
+      <div className="flex h-[460px] items-center justify-center rounded-xl border border-border bg-muted text-sm text-muted-foreground">
         Loading 3D farm prototype...
       </div>
     ),
@@ -42,16 +42,18 @@ function FarmPrototypePanel({ projectId }: { projectId: string }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-      <Card>
+      <Card className="shadow-sm">
         <CardContent className="p-3">
-          <div className="h-[460px] overflow-hidden rounded-xl bg-muted">
+          <div className="h-[460px] overflow-hidden rounded-xl border border-border bg-muted">
             <FarmScene layout={layout} />
           </div>
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
-          <Cuboid className="h-7 w-7 text-primary" />
+      <Card className="shadow-xs">
+        <CardHeader className="space-y-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-info-soft text-info">
+            <Cuboid className="h-5 w-5" />
+          </div>
           <CardTitle>Layout legend</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">

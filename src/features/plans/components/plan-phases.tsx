@@ -23,28 +23,28 @@ const PHASE_COLORS: {
   icon: string;
 }[] = [
   {
-    border: "border-l-amber-500",
-    badge: "bg-amber-50 text-amber-700 border-amber-200",
-    number: "bg-amber-100 text-amber-700",
-    icon: "text-amber-500",
+    border: "border-l-soil",
+    badge: "bg-warning-soft text-warning-foreground border-transparent",
+    number: "bg-warning-soft text-warning-foreground",
+    icon: "text-soil",
   },
   {
-    border: "border-l-green-500",
-    badge: "bg-green-50 text-green-700 border-green-200",
-    number: "bg-green-100 text-green-700",
-    icon: "text-green-500",
+    border: "border-l-growth",
+    badge: "bg-success-soft text-success border-transparent",
+    number: "bg-success-soft text-success",
+    icon: "text-growth",
   },
   {
-    border: "border-l-emerald-500",
-    badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    number: "bg-emerald-100 text-emerald-700",
-    icon: "text-emerald-500",
+    border: "border-l-primary",
+    badge: "bg-accent text-primary-strong border-transparent",
+    number: "bg-accent text-primary-strong",
+    icon: "text-primary",
   },
   {
-    border: "border-l-orange-500",
-    badge: "bg-orange-50 text-orange-700 border-orange-200",
-    number: "bg-orange-100 text-orange-700",
-    icon: "text-orange-500",
+    border: "border-l-water",
+    badge: "bg-info-soft text-info border-transparent",
+    number: "bg-info-soft text-info",
+    icon: "text-water",
   },
 ];
 
@@ -80,17 +80,18 @@ export function PlanPhases({ projectId, phases }: PlanPhasesProps) {
           return (
             <Card
               key={phase.name}
-              className={`overflow-hidden border-l-4 ${color.border} transition-shadow hover:shadow-md`}
+              className={`overflow-hidden border-l-4 ${color.border} shadow-xs transition-shadow hover:shadow-md`}
             >
               <button
                 type="button"
                 onClick={() => toggle(phaseIdx)}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+                aria-expanded={isOpen}
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-muted/40"
               >
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="font-semibold">{phase.name}</span>
+                  <span className="font-semibold text-foreground">{phase.name}</span>
                   <span
-                    className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${color.badge}`}
+                    className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${color.badge}`}
                   >
                     {phase.substages.length} steps
                   </span>
@@ -112,7 +113,7 @@ export function PlanPhases({ projectId, phases }: PlanPhasesProps) {
                     {phase.substages.map((substage) => (
                       <li
                         key={substage.step_number}
-                        className="flex gap-4 rounded-lg border bg-muted/30 p-4"
+                        className="flex gap-4 rounded-lg border border-border bg-muted/40 p-4"
                       >
                         <div
                           className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${color.number}`}

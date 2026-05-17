@@ -123,18 +123,22 @@ export function SellListingForm({ onSuccess }: SellListingFormProps) {
 
   if (submitted && summary) {
     return (
-      <Card className="max-w-lg border-[#d9e2d2]">
+      <Card className="max-w-lg shadow-sm">
         <CardHeader>
-          <CardTitle className="font-serif text-[#1B4332]">Listing submitted</CardTitle>
+          <CardTitle className="font-serif text-primary-strong">
+            Listing submitted
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
           <p>Your listing was saved and is now visible on the marketplace for buyers to bid.</p>
           <ul className="space-y-1 text-muted-foreground">
             <li>
-              <strong>Product:</strong> {String(summary.title)}
+              <strong className="text-foreground">Product:</strong>{" "}
+              {String(summary.title)}
             </li>
             <li>
-              <strong>Starting bid:</strong> LKR {Number(summary.startPrice).toLocaleString()}
+              <strong className="text-foreground">Starting bid:</strong> LKR{" "}
+              {Number(summary.startPrice).toLocaleString()}
             </li>
           </ul>
           <Button onClick={() => router.push("/#marketplace")}>View marketplace</Button>
@@ -151,10 +155,10 @@ export function SellListingForm({ onSuccess }: SellListingFormProps) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div>
+        <div className="space-y-1.5">
           <Label>Type</Label>
           <select
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+            className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm shadow-xs"
             value={productType}
             onChange={(e) => setProductType(e.target.value as ProductType)}
           >
@@ -165,10 +169,10 @@ export function SellListingForm({ onSuccess }: SellListingFormProps) {
             ))}
           </select>
         </div>
-        <div>
+        <div className="space-y-1.5">
           <Label>Category</Label>
           <select
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+            className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm shadow-xs"
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
             required
@@ -187,8 +191,8 @@ export function SellListingForm({ onSuccess }: SellListingFormProps) {
       </div>
 
       {floorDisplay != null && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">
-          <p className="font-semibold text-[#1B4332]">
+        <div className="rounded-lg border border-warning/40 bg-warning-soft p-4 text-sm">
+          <p className="font-semibold text-warning-foreground">
             Floor price (set by authority)
           </p>
           <p className="text-muted-foreground">
@@ -198,18 +202,22 @@ export function SellListingForm({ onSuccess }: SellListingFormProps) {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div>
+        <div className="space-y-1.5">
           <Label htmlFor="quantity">Quantity</Label>
           <Input id="quantity" name="quantity" type="number" min={0.01} step="any" required />
         </div>
-        <div>
+        <div className="space-y-1.5">
           <Label>Unit</Label>
-          <div className="mt-2 flex gap-2">
+          <div className="flex gap-2">
             {UNITS.map((u) => (
               <button
                 key={u.value}
                 type="button"
-                className={`rounded-lg border px-4 py-2 text-sm ${unit === u.value ? "border-[#1B4332] bg-[#edf2e8] font-medium" : ""}`}
+                className={`rounded-md border px-4 py-2 text-sm transition-colors ${
+                  unit === u.value
+                    ? "border-primary bg-accent font-medium text-primary-strong"
+                    : "border-input bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
                 onClick={() => setUnit(u.value)}
               >
                 {u.label}
@@ -219,12 +227,12 @@ export function SellListingForm({ onSuccess }: SellListingFormProps) {
         </div>
       </div>
 
-      <div>
+      <div className="space-y-1.5">
         <Label htmlFor="district">Location (district)</Label>
         <select
           id="district"
           name="district"
-          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+          className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm shadow-xs"
           required
         >
           {SRI_LANKA_DISTRICTS.map((d) => (
@@ -267,7 +275,7 @@ export function SellListingForm({ onSuccess }: SellListingFormProps) {
         <Input id="startPrice" name="startPrice" type="number" min={1} required />
       </div>
 
-      <Button type="submit" className="bg-[#1B4332] hover:bg-[#2d6a4f]" disabled={loading}>
+      <Button type="submit" size="lg" disabled={loading}>
         {loading ? "Submitting…" : "List for bidding"}
       </Button>
     </form>

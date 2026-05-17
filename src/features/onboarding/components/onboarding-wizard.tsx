@@ -312,7 +312,8 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
             </>
           ) : null}
 
-          <div className="rounded-lg bg-muted p-4 text-sm leading-6 text-muted-foreground">
+          <div className="rounded-lg border border-border bg-mint-gradient p-4 text-sm leading-6 text-muted-foreground">
+            <span className="font-medium text-foreground">Tip — </span>
             For soil, water, and sunlight, &quot;Not sure&quot; is fine — the AI will
             note assumptions. You must name one crop and upload a land photo before
             generating your plan.
@@ -390,7 +391,7 @@ function SelectField({
       <Label htmlFor={id}>{label}</Label>
       <select
         id={id}
-        className="h-11 w-full rounded-md border bg-background px-3 text-sm"
+        className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm shadow-xs transition-colors hover:border-border-strong focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25"
         {...registration}
       >
         {options.map((option) => (
