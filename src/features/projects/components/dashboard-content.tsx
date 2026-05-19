@@ -21,7 +21,7 @@ export function DashboardContent() {
     <div className="space-y-8">
       <PageHeader
         title="Your farming projects"
-        description="Create projects for each land area, then AgriPilot will guide planning, crop selection, tasks, and troubleshooting."
+        description="Create projects for each land area, then AgriPlus will guide planning, crop selection, tasks, and troubleshooting."
         actions={
           <Button asChild>
             <Link href="/projects/new">
@@ -31,7 +31,7 @@ export function DashboardContent() {
         }
       />
 
-      <Card className="bg-primary text-primary-foreground">
+      {/* <Card className="bg-primary text-primary-foreground">
         <CardContent className="grid gap-4 p-6 md:grid-cols-[1fr_auto] md:items-center">
           <div>
             <p className="text-sm font-semibold opacity-80">Recommended next action</p>
@@ -43,7 +43,7 @@ export function DashboardContent() {
             <Link href="/projects/demo-project/onboarding">Continue onboarding</Link>
           </Button>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -54,7 +54,7 @@ export function DashboardContent() {
       ) : isError ? (
         <EmptyState
           title="We could not load your projects"
-          description="Check your connection and try again. Your saved projects will appear here once Supabase is connected."
+          description="Check that you are logged in and the backend API is running on port 5000."
         />
       ) : projects?.length ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

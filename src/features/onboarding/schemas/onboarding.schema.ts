@@ -3,6 +3,7 @@ import { z } from "zod";
 export const onboardingSchema = z.object({
   landArea: z.number().positive("Add the land size, even an estimate."),
   landUnit: z.enum(["sqft", "perch", "acre"]),
+  landImage: z.string().optional(),
   soilType: z.string().min(1, "Choose the closest soil option."),
   drainage: z.string().min(1, "Choose what happens after heavy rain."),
   waterSource: z.string().min(1, "Choose the main water source."),

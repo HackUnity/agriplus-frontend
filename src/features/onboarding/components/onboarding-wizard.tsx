@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, type UseFormRegisterReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,15 +11,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { LandImageField } from "@/features/onboarding/components/land-image-field";
+import { PipelineLoadingOverlay } from "@/features/onboarding/components/pipeline-loading-overlay";
+import { PlanningApiBanner } from "@/features/onboarding/components/planning-api-banner";
+import { usePlanningApiStatus } from "@/features/onboarding/hooks/use-planning-api-status";
 import { onboardingSteps } from "@/features/onboarding/constants";
 import {
   onboardingSchema,
   type OnboardingValues,
 } from "@/features/onboarding/schemas/onboarding.schema";
 import {
-  loadDraft,
+  loadLandDetails,
   saveLandDetails,
 } from "@/features/onboarding/services/land-details.service";
+import { setProjectStatusApi } from "@/lib/api/projects";
+import {
+  CropSelectionError,
+  dataUrlToFile,
+  mapOnboardingToManualInputs,
+} from "@/features/onboarding/utils/manual-inputs.mapper";
+import { runAgronomyPipeline } from "@/lib/api/pipeline";
+import { savePipelineResult } from "@/features/plans/services/pipeline-storage.service";
 
 const defaultValues: OnboardingValues = {
   landArea: 500,
@@ -32,14 +44,17 @@ const defaultValues: OnboardingValues = {
   goal: "Grow food for home",
   weeklyTime: 5,
   budget: "Low starter budget",
-  cropPreference: "Not sure",
+  cropPreference: "",
 };
 
 export function OnboardingWizard({ projectId }: { projectId: string }) {
   const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
   const [saving, setSaving] = useState(false);
-  const draft = useMemo(() => loadDraft(projectId), [projectId]);
+  const [generatingPlan, setGeneratingPlan] = useState(false);
+  const [pendingCropName, setPendingCropName] = useState<string | undefined>();
+  const { status: apiStatus } = usePlanningApiStatus();
+  const [draftLoaded, setDraftLoaded] = useState(false);
   const step = onboardingSteps[stepIndex];
 
   const {
@@ -47,11 +62,29 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
     handleSubmit,
     trigger,
     getValues,
+    setValue,
+    watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
-    defaultValues: { ...defaultValues, ...draft },
+    defaultValues,
   });
+
+  useEffect(() => {
+    let cancelled = false;
+    loadLandDetails(projectId).then((draft) => {
+      if (!cancelled) {
+        reset({ ...defaultValues, ...draft });
+        setDraftLoaded(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId, reset]);
+
+  const landImage = watch("landImage");
 
   async function goNext() {
     const valid = await trigger(step.fields);
@@ -68,27 +101,84 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
     }
   }
 
-  async function onSubmit(values: OnboardingValues) {
-    await saveLandDetails(projectId, values);
-    const response = await fetch("/api/ai/generate-plan", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ projectId, landDetails: values }),
-    });
+  async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-    if (!response.ok) {
-      toast.error("Plan generation failed", {
-        description: "Your answers are saved. Please try again.",
-      });
+    if (stepIndex < onboardingSteps.length - 1) {
+      await goNext();
       return;
     }
 
-    toast.success("Farming plan generated");
-    router.push(`/projects/${projectId}/plan`);
+    await handleSubmit(onSubmit)(event);
+  }
+
+  async function onSubmit(values: OnboardingValues) {
+    await saveLandDetails(projectId, values);
+
+    if (!values.landImage) {
+      toast.error("Land photo required", {
+        description:
+          "Upload a photo of your plot on step 1 so the AI can analyze it with your answers.",
+      });
+      setStepIndex(0);
+      return;
+    }
+
+    let manualInputs: Record<string, unknown>;
+    try {
+      manualInputs = mapOnboardingToManualInputs(values);
+    } catch (error) {
+      const message =
+        error instanceof CropSelectionError
+          ? error.message
+          : "Could not read your crop preference.";
+      toast.error("Check crop preference", { description: message });
+      return;
+    }
+
+    const crops = manualInputs.crops_to_grow;
+    const cropLabel = Array.isArray(crops) ? crops[0] : undefined;
+    setPendingCropName(typeof cropLabel === "string" ? cropLabel : undefined);
+    setGeneratingPlan(true);
+
+    try {
+      await setProjectStatusApi(projectId, "generating");
+      const imageFile = dataUrlToFile(values.landImage);
+      const result = await runAgronomyPipeline(imageFile, manualInputs);
+      await savePipelineResult(projectId, result);
+      toast.success("Farming plan generated", {
+        description: result.plan.crop
+          ? `Personalized plan for ${result.plan.crop}.`
+          : undefined,
+      });
+      router.push(`/projects/${projectId}/plan`);
+    } catch (error) {
+      toast.error("Plan generation failed", {
+        description:
+          error instanceof Error
+            ? error.message
+            : "Your answers are saved. Please try again.",
+      });
+    } finally {
+      setGeneratingPlan(false);
+      setPendingCropName(undefined);
+    }
+  }
+
+  const busy = saving || isSubmitting || generatingPlan || !draftLoaded;
+
+  if (!draftLoaded) {
+    return <p className="text-muted-foreground">Loading your saved answers...</p>;
   }
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+    <>
+      {generatingPlan ? (
+        <PipelineLoadingOverlay cropName={pendingCropName} />
+      ) : null}
+
+      <form className="space-y-6" onSubmit={handleFormSubmit} aria-busy={generatingPlan}>
+      <PlanningApiBanner />
       <Card>
         <CardHeader className="space-y-4">
           <div>
@@ -123,6 +213,13 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
                 options={["Less than 4 hours", "4 to 6 hours", "6 or more hours"]}
                 registration={register("sunlight")}
                 error={errors.sunlight?.message}
+              />
+              <LandImageField
+                value={landImage}
+                onChange={(image) =>
+                  setValue("landImage", image, { shouldDirty: true })
+                }
+                error={errors.landImage?.message}
               />
             </>
           ) : null}
@@ -200,9 +297,12 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
                 <Label htmlFor="cropPreference">Crop preferences</Label>
                 <Textarea
                   id="cropPreference"
-                  placeholder="Example: tomatoes, greens, okra, or not sure"
+                  placeholder="One crop only, e.g. tomatoes or okra"
                   {...register("cropPreference")}
                 />
+                <p className="text-xs text-muted-foreground">
+                  The AI plan supports one crop per plot. List your main choice only.
+                </p>
                 {errors.cropPreference ? (
                   <p className="text-sm text-destructive">
                     {errors.cropPreference.message}
@@ -213,9 +313,9 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
           ) : null}
 
           <div className="rounded-lg bg-muted p-4 text-sm leading-6 text-muted-foreground">
-            Not sure is acceptable. The AI will treat uncertain answers as
-            assumptions and explain where better information would improve the
-            plan.
+            For soil, water, and sunlight, &quot;Not sure&quot; is fine — the AI will
+            note assumptions. You must name one crop and upload a land photo before
+            generating your plan.
           </div>
         </CardContent>
       </Card>
@@ -224,7 +324,7 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
         <Button
           type="button"
           variant="outline"
-          disabled={stepIndex === 0 || isSubmitting}
+          disabled={stepIndex === 0 || busy}
           onClick={() => setStepIndex((current) => current - 1)}
         >
           Back
@@ -234,17 +334,21 @@ export function OnboardingWizard({ projectId }: { projectId: string }) {
             <span className="text-sm text-muted-foreground">Saving draft...</span>
           ) : null}
           {stepIndex === onboardingSteps.length - 1 ? (
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Generating plan..." : "Generate farming plan"}
+            <Button
+              type="submit"
+              disabled={busy || apiStatus === "unavailable"}
+            >
+              Generate farming plan
             </Button>
           ) : (
-            <Button type="button" onClick={goNext}>
+            <Button type="submit" disabled={busy}>
               Save and continue
             </Button>
           )}
         </div>
       </div>
     </form>
+    </>
   );
 }
 

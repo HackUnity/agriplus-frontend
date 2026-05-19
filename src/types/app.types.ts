@@ -16,12 +16,38 @@ export type CropRecommendation = {
   timeline: string;
 };
 
-export type FarmingStep = {
+export type SubTask = {
+  id: string;
+  title: string;
+  status: StepStatus;
+};
+
+export type FarmingGoal = {
   id: string;
   title: string;
   timing: string;
   description: string;
   status: StepStatus;
+  subtasks: SubTask[];
+};
+
+export type PlanSubstage = {
+  step_number: number;
+  title: string;
+  description: string;
+  estimated_days: number;
+  requires_physical_action_image: boolean;
+  image_prompt_context: string | null;
+};
+
+export type PlanPhase = {
+  name: string;
+  substages: PlanSubstage[];
+};
+
+export type PlanFaq = {
+  question: string;
+  answer: string;
 };
 
 export type FarmingPlan = {
@@ -32,7 +58,9 @@ export type FarmingPlan = {
   assumptions: string[];
   recommendations: CropRecommendation[];
   risks: string[];
-  steps: FarmingStep[];
+  goals: FarmingGoal[];
+  phases?: PlanPhase[];
+  faqs?: PlanFaq[];
 };
 
 export type Project = {

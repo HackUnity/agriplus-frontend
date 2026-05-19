@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bot, Cuboid, FileText, ListChecks } from "lucide-react";
 import { PageHeader } from "@/components/common/page-header";
@@ -8,13 +9,28 @@ import { ProjectStatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { loadProgressGoals } from "@/features/progress/services/progress.service";
+import { countSubtasks } from "@/features/progress/utils/progress.utils";
 import { getProject } from "@/features/projects/services/projects.service";
 
 export function ProjectDetailsContent({ projectId }: { projectId: string }) {
+  const [readiness, setReadiness] = useState(0);
   const { data: project, isLoading } = useQuery({
     queryKey: ["project", projectId],
     queryFn: () => getProject(projectId),
   });
+
+  useEffect(() => {
+    let cancelled = false;
+    loadProgressGoals(projectId).then((goals) => {
+      if (!cancelled) {
+        setReadiness(Math.round(countSubtasks(goals).percent));
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
 
   if (isLoading) {
     return <p className="text-muted-foreground">Loading project...</p>;
@@ -32,7 +48,7 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
         actions={<ProjectStatusBadge status={project.status} />}
       />
 
-      <Card className="bg-muted">
+      {/* <Card className="bg-muted">
         <CardContent className="grid gap-4 p-6 md:grid-cols-[1fr_auto] md:items-center">
           <div>
             <p className="text-sm font-semibold text-primary">Next action</p>
@@ -48,7 +64,7 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
             </Link>
           </Button>
         </CardContent>
-      </Card>
+      </Card> */}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
@@ -62,7 +78,7 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
             title: "Progress tracker",
             icon: ListChecks,
             href: `/projects/${project.id}/progress`,
-            text: "Weekly steps with practical instructions.",
+            text: "Goals with sub-tasks and practical instructions.",
           },
           {
             title: "3D farm layout",
@@ -98,18 +114,18 @@ export function ProjectDetailsContent({ projectId }: { projectId: string }) {
         })}
       </div>
 
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Project readiness</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <Progress value={68} />
+          <Progress value={readiness} />
           <p className="text-sm text-muted-foreground">
-            Land profile and plan are available. Complete weekly tasks to
-            increase readiness.
+            Land profile and plan are available. Complete goal sub-tasks to
+            increase readiness ({readiness}%).
           </p>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }

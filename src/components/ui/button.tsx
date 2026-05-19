@@ -4,22 +4,31 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        default:
+          "bg-primary text-primary-foreground shadow-sm hover:bg-forest-deep hover:shadow-md active:scale-[0.98]",
+        secondary:
+          "bg-secondary text-secondary-foreground shadow-sm hover:bg-forest hover:shadow-md",
         outline:
-          "border bg-background text-foreground hover:bg-muted hover:text-foreground",
-        ghost: "hover:bg-muted hover:text-foreground",
+          "border border-border-strong bg-surface text-foreground hover:border-primary hover:bg-mint-soft hover:text-primary",
+        ghost:
+          "text-foreground hover:bg-mint-soft hover:text-primary",
+        soft:
+          "bg-mint text-forest-deep hover:bg-mint-soft hover:text-primary",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+        warning:
+          "bg-warning text-forest-deep shadow-sm hover:brightness-95",
+        link:
+          "rounded-none text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-12 rounded-lg px-6",
+        default: "h-10 px-5 py-2",
+        sm: "h-9 px-4 text-[13px]",
+        lg: "h-12 px-7 text-base",
         icon: "h-10 w-10",
       },
     },

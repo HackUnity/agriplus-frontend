@@ -1,74 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/common/page-header";
-import { StepStatusBadge } from "@/components/common/status-badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { demoPlan } from "@/lib/demo-data";
-import type { FarmingStep, StepStatus } from "@/types/app.types";
-
-const nextStatus: Record<StepStatus, StepStatus> = {
-  todo: "doing",
-  doing: "done",
-  done: "todo",
-  blocked: "doing",
-};
+import { GoalCard } from "@/features/progress/components/goal-card";
+import {
+  loadProgressGoals,
+  saveProgressGoals,
+} from "@/features/progress/services/progress.service";
+import {
+  countSubtasks,
+  updateSubtaskStatus,
+} from "@/features/progress/utils/progress.utils";
+import type { FarmingGoal } from "@/types/app.types";
 
 export function ProgressTracker({ projectId }: { projectId: string }) {
-  const [steps, setSteps] = useState<FarmingStep[]>(demoPlan.steps);
-  const completed = steps.filter((step) => step.status === "done").length;
-  const percent = (completed / steps.length) * 100;
+  const [goals, setGoals] = useState<FarmingGoal[]>([]);
+  const { total, completed, percent } = countSubtasks(goals);
 
-  function updateStep(stepId: string) {
-    setSteps((current) =>
-      current.map((step) =>
-        step.id === stepId ? { ...step, status: nextStatus[step.status] } : step,
-      ),
-    );
+  useEffect(() => {
+    let cancelled = false;
+    loadProgressGoals(projectId).then((loaded) => {
+      if (!cancelled) {
+        setGoals(loaded);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
+
+  function handleSubtaskChange(goalId: string, subtaskId: string) {
+    setGoals((current) => {
+      const updated = updateSubtaskStatus(current, goalId, subtaskId);
+      void saveProgressGoals(projectId, updated);
+      return updated;
+    });
   }
 
   return (
     <div className="space-y-8">
       <PageHeader
         title="Farming progress tracker"
-        description="Follow the plan as simple actions. Update each step as you start or finish it."
+        description="Work through each goal and its sub-tasks. Goal status updates automatically as you complete sub-tasks."
       />
 
       <Card>
         <CardHeader>
-          <CardTitle>This project is {Math.round(percent)}% through the first plan</CardTitle>
+          <CardTitle>
+            This project is {Math.round(percent)}% through the first plan
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Progress value={percent} />
           <p className="text-sm text-muted-foreground">
-            Project ID: {projectId}. Completed {completed} of {steps.length} steps.
+            Completed {completed} of {total} sub-tasks across {goals.length}{" "}
+            goals.
           </p>
         </CardContent>
       </Card>
 
-      <div className="space-y-4">
-        {steps.map((step) => (
-          <Card key={step.id}>
-            <CardContent className="grid gap-4 p-5 md:grid-cols-[1fr_auto] md:items-center">
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="text-lg font-semibold">{step.title}</h2>
-                  <StepStatusBadge status={step.status} />
-                </div>
-                <p className="text-sm font-semibold text-primary">{step.timing}</p>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  {step.description}
-                </p>
-              </div>
-              <Button variant="outline" onClick={() => updateStep(step.id)}>
-                Update status
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {goals.length > 0 ? (
+        <div className="space-y-4">
+          {goals.map((goal) => (
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              onSubtaskStatusChange={handleSubtaskChange}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-muted-foreground">
+          Generate your farming plan from onboarding to see cultivation steps here.
+        </p>
+      )}
     </div>
   );
 }

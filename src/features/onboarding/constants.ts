@@ -4,7 +4,7 @@ export const onboardingSteps = [
     title: "Land basics",
     description:
       "Estimate your growing area. Exact measurements can be improved later.",
-    fields: ["landArea", "landUnit", "sunlight"],
+    fields: ["landArea", "landUnit", "sunlight", "landImage"],
   },
   {
     id: "soil-water",

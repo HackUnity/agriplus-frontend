@@ -21,13 +21,19 @@ Go to `/login` and click **Enter as demo user** — no credentials required.
 
 ## Environment Variables
 
-Copy `.env.example` to `.env.local` and fill in your Supabase keys to connect a real database. The app runs fully on demo data without them.
+Copy `.env.example` to `.env.local` and adjust per environment. **No URL is hardcoded** — every backend call goes through `NEXT_PUBLIC_API_URL`, so you can point the same build at local, staging, or production by changing one variable.
 
 ```
+# Required — base URL of the FastAPI backend (no trailing slash)
+NEXT_PUBLIC_API_URL=http://localhost:5000
+
+# Optional — Supabase connection (app uses demo data when blank)
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 AI_PROVIDER_API_KEY=
 ```
+
+For Vercel/Docker deployments, set `NEXT_PUBLIC_API_URL` in the host's environment settings — do **not** edit the source. The single source of truth is `src/lib/env.ts`.
 
 ## Key Pages
 

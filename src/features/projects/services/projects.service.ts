@@ -1,62 +1,49 @@
-import { demoProjects } from "@/lib/demo-data";
-import { hasSupabaseEnv } from "@/lib/env";
-import { createClient } from "@/lib/supabase/client";
-import type { Project } from "@/types/app.types";
+import {
+  createProjectApi,
+  getProjectApi,
+  listProjectsApi,
+  type ProjectRecord,
+} from "@/lib/api/projects";
+import type { CreateProjectValues } from "@/features/projects/schemas/create-project.schema";
+import type { Project, ProjectStatus } from "@/types/app.types";
+
+function mapProject(record: ProjectRecord): Project {
+  return {
+    id: record.id,
+    name: record.name,
+    location: record.location ?? "Location not added",
+    goal: record.goal ?? "Goal not added",
+    area: record.area,
+    status: record.status as ProjectStatus,
+    nextAction: record.next_action,
+    updatedAt: record.updated_at
+      ? new Date(record.updated_at).toLocaleDateString()
+      : "",
+  };
+}
+
+export async function createProject(
+  values: CreateProjectValues,
+): Promise<Project> {
+  const record = await createProjectApi(values);
+  return mapProject(record);
+}
 
 export async function listProjects(): Promise<Project[]> {
-  if (!hasSupabaseEnv) {
-    return demoProjects;
-  }
-
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("projects")
-    .select("*")
-    .order("updated_at", { ascending: false });
-
-  if (error) {
-    throw error;
-  }
-
-  return data.map((project) => ({
-    id: project.id,
-    name: project.name,
-    location: project.location ?? "Location not added",
-    goal: project.goal ?? "Goal not added",
-    area: "Land details pending",
-    status: project.status as Project["status"],
-    nextAction:
-      project.status === "ready"
-        ? "Review your farming plan"
-        : "Complete onboarding details",
-    updatedAt: new Date(project.updated_at).toLocaleDateString(),
-  }));
+  const records = await listProjectsApi();
+  return records.map(mapProject);
 }
 
 export async function getProject(projectId: string): Promise<Project | null> {
-  if (!hasSupabaseEnv) {
-    return demoProjects.find((project) => project.id === projectId) ?? null;
-  }
-
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("id", projectId)
-    .single();
-
-  if (error) {
+  try {
+    const record = await getProjectApi(projectId);
+    return mapProject(record);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("not found")) {
+      return null;
+    }
     throw error;
   }
-
-  return {
-    id: data.id,
-    name: data.name,
-    location: data.location ?? "Location not added",
-    goal: data.goal ?? "Goal not added",
-    area: "Land details pending",
-    status: data.status as Project["status"],
-    nextAction: data.status === "ready" ? "Review your plan" : "Continue setup",
-    updatedAt: new Date(data.updated_at).toLocaleDateString(),
-  };
 }
+
+export { getProjectApi };
